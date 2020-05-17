@@ -134,6 +134,8 @@ Fauna. This where we'll also keep the GraphQL schema.
 > "GraphQL is a specification for an API query language and a server engine
 > capable of executing such queries."[]()
 
+"As a first step, create a project directory and navigate into it:"
+
 ```shell
 mkdir fauna-seeder
 cd fauna-seeder
@@ -153,10 +155,13 @@ echo ".env" >> .gitignore
 ```
 
 "Then let's add an empty package.json file:"
+"Next, initialize a TypeScript project and add the Prisma CLI as a development dependency to it:"
 
 ```shell
 npm init -y
 ```
+
+"This creates a package.json with an initial setup for your TypeScript app."
 
 https://www.youtube.com/watch?v=KlUPiQaTp0I
 FaunaDB has a native GraphQL layer
@@ -204,6 +209,8 @@ Collections, Documents and Indexes.
 Create a new database which we will call `repos`.
 
 SCREENSHOT
+
+Before moving on to the next section
 
 ## Importing the schema
 
@@ -297,6 +304,8 @@ exports.client = createClient();
 exports.query = query;
 ```
 
+## Write data into the database
+
 Create a `data.json` file containing the array of repos that we will seed to
 Fauna's database:
 
@@ -371,6 +380,7 @@ client
 # Creating and configuring our Nuxt.js app
 
 Introduction to the step. What are we going to do and why are we doing it?
+"To get started quickly,"
 "We will start by initializing the project with the Nuxt.js create app template."
 
 ```shell
@@ -379,21 +389,15 @@ npx create-nuxt-app repo-aggregator
 
 "Navigate through the guide and select the following options:"
 
-    package manager of your choice
-
-    none UI Framework
-
-    none custom server framework
-
-    no modules needed
-
-    choose Universal rendering mode (SSR)
+- Add axios module to make HTTP request easily into your application.
+- dotenv
+- bulma
 
 Let's also install the required dependencies:
 Fauna driver we've used to populate the database in the seeder app.
 
 ```
-npm install faunadb
+npm install faunadb slugify
 ```
 
 ### Env variables
@@ -413,7 +417,7 @@ not going to be displayed again
 add the API key you've just generated `.env` file:
 
 ```
-FAUNA_SECRET=
+FAUNA_ADMIN_KEY=
 ```
 
 ready to add documents to our collection
@@ -424,17 +428,87 @@ node seed.js
 
 "From here, we just need to . That’s where mapBookmarks() comes in!"
 
-## Env vars
+## Nuxt Repo Catalogue
+
+We begin by invoking Nuxt's scaffolding tool:
+
+```shell
+npx create-nuxt-app repo-catalogue
+```
 
 First, we build our project in dev mode, in order to access the right local
 environment variables:
 
-Now `cd repo-catalogue` and edit `nuxt.config.js` the central point of a Nuxt
+.env: A dotenv file for defining environment variables (used for your database
+connection)
+
+Now `cd repo-catalogue`
+
+The same way we did it before, let's creat a Fauna key - this time with Server
+role
+
+and create
+use fetch data from the collection
+
+```
+FAUNA_SERVER_KEY=
+```
+
+and edit `nuxt.config.js` the central point of a Nuxt
 app
+
+```javascript
+require("dotenv").config();
+```
 
 Add the following to your nuxt.config.js:
 
 ## Setting up the Project
+
+Add after build, property the generate:
+routes function
+
+```javascript
+generate: {
+    async routes() {
+      const faunadb = require('faunadb')
+      const query = faunadb.query
+      const slugify = require('slugify')
+      const q = query
+      if (!process.env.FAUNA_SERVER_KEY) {
+        throw new Error('FAUNA_SERVER_KEY not found.')
+      }
+      const client = new faunadb.Client({
+        secret: process.env.FAUNA_SERVER_KEY
+      })
+      const result = await client.query(
+        q.Map(
+          q.Paginate(q.Match(q.Index('allRepos'))),
+          q.Lambda('X', q.Get(q.Var('X')))
+        )
+      )
+      const repos = result.data.map((repo) => repo.data)
+      return repos.map((repo) => {
+        const repoUrlParts = repo.repoUrl.split('/')
+        return {
+          route:
+            '/repos/' +
+            slugify(repoUrlParts[repoUrlParts.length - 1], {
+              remove: /[*+~.()'"!:@]/g
+            }),
+          payload: repo
+        }
+      })
+    }
+  }
+```
+
+Here's a quick overview of the different parts of the code snippet:
+Import the PrismaClient constructor from the @prisma/client node module
+Instantiate PrismaClient
+Define an async function called main to send queries to the database
+Call the main function
+Close the database connections when the script terminates
 
 - Implementing the page layouts
 - Implementing the API calls
@@ -465,6 +539,8 @@ structure for our app. Our pages folder should look like this:
 ```
 
 Let's add some CSS to give some style to our app
+
+Start with `pages/index.vue` and replace it with:
 
 ## Running nuxt generate
 
@@ -517,6 +593,16 @@ back its rating.
 
 Load this data on the client To load the data of a GitHub repo on the client, we
 have to add some code `/pages/repos/_slug.js`:
+
+```javascript
+mounted() {
+  this.$nextTick(async () => {
+    const result = await this.$axios.$get(
+      `https://api.github.com/repos/ramigs/dynamic-order-change-html`)
+    this.repoData = result
+  })
+}
+```
 
 # Conclusion
 
