@@ -5,8 +5,13 @@ generate a static site with data pulled from FaunaDB at build time. But
 pre-rendering is not all we will be doing. We will also to load the details of a
 client-side hydration
 
+"The primary focus will be on"
+
+The tutorial section will
+
 At the end you/When we finish, you'll be able to take this example, translate
 and apply it to your specific use case.
+"You can also adapt this tutorial context for other real-time apps very easily."
 
 ## Why a repository catalogue?
 
@@ -98,6 +103,8 @@ be doing with different
 
 ## Pre-requisites
 
+Before you continue reading this article, I’d like to mention that a working knowledge of the following technologies (or substitutes) are beneficial:
+
 Before you begin this guide you'll need the following:
 
 - Node and npm installed
@@ -130,6 +137,8 @@ Resource on writing schema
 
 In this section, we'll be creating the helper app `fauna-seeder` that we will use to populate
 Fauna. This where we'll also keep the GraphQL schema.
+
+"GraphQL also uses a typed schema."
 
 > "GraphQL is a specification for an API query language and a server engine
 > capable of executing such queries."[]()
@@ -563,7 +572,7 @@ npm run generate
 And that's it!
 "You have a working static"
 
-## Adding dynamic content to our website
+## Adding dynamic content to our Repo Catalogue
 
 Probably the main objection for static/pre-rendered sites is "I don't want to
 have to rebuild the entire site" every time something changes in the database.
