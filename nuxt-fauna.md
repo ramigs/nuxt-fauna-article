@@ -1,32 +1,41 @@
-## Introduction
+## Intro
 
-In this article, we will build a GitHub repo catalogue, using Nuxt.js to
-generate a static site with data pulled from FaunaDB at build time. But
+In this article, we will build a Repository Catalogue, using Nuxt.js to generate
+a static site with data being fetched from FaunaDB, at build time.
+
+But
 pre-rendering is not all we will be doing. We will also to load the details of a
 client-side hydration
 
+The main idea I want to present is the benefit of being able to fetch data from
+a database and use it to build a static/pre-rendered site that can be served
+directly from a CDN. Jamstack approach
+
+Let's imagine we have a Film catalogue. It's not that often that we need to add
+or delete a Film from the catalogue. Do we need to have a server query a
+database at each client request? Couldn't we pass the heavy lifting to the build
+process?
+
 "The primary focus will be on"
 
-The tutorial section will
-
-At the end you/When we finish, you'll be able to take this example, translate
-and apply it to your specific use case.
-"You can also adapt this tutorial context for other real-time apps very easily."
-
-## Why a repository catalogue?
+## Why a Repository Catalogue?
 
 As developers, we all have a some projects we admire and like to keep track and
-stay updated. our list of favorite repos to follow overview of the GitHub
+stay updated. our list of favorite projects to follow overview of the GitHub
 repositories you're interested in, and displaying the information that is more
 relevant to you In this example, we'll display the GitHub stars and the date of
 last commit.
 
 only some have a special place in your heart and that does not happen every day.
 
+At the end of the tutorial, you/When we finish, you'll be able to take this
+example, translate and apply it to your specific use case. "You can also adapt
+this tutorial context for other real-time apps very easily."
+
 ## Jamstack
 
 The concept of Jamstack is not new and its advantages have been extensively
-documented before. Jamstack architectures allow us to build more secure,
+documented before. Jamstack architectures allow us to build more secure, more
 scalable, faster websites.
 
 The term "static" can be a bit misleading - that's why I like to use
@@ -36,15 +45,6 @@ have to compromise on dynamic data.
 The widespread of functionality APIs makes way for common tasks - such as
 authentication, e-commerce, and data storage - that used to be implemented over
 and over, now be delegated to the experts of those specific domains.
-
-The main idea I want to present is the benefit of being able to fetch data from
-a database and use it to build a static/pre-rendered site that can be served
-directly from a CDN.
-
-Let's imagine we have a Film catalogue. It's not that often that we need to add
-or delete a Film from the catalogue. Do we need to have a server query a
-database at each client request? Couldn't we pass the heavy lifting to the build
-process?
 
 distinguishing static data and real-time data
 
@@ -72,38 +72,45 @@ to the client?
 
 ## FaunaDB
 
-FaunaDB "is a distributed database that promises to be always consistent, always
-secure, global low-latency, zero operations no need to manage servers"
+FaunaDB is a globally "distributed database that promises to be always
+consistent, always secure, low-latency" Plus, a Fauna database scales
+automatically and it's globally distributed.
 
-As a serverless database, FaunaDB allows our applications to access data "as a
-service". Contrary to more "traditional" databases, there's no need to host and
-manage our own database. Plus, a Fauna database scales automatically and it's
-globally distributed.
+As a **serverless** database, FaunaDB allows our applications to access data "as
+a service". Contrary to more "traditional" databases, there's no need to host
+and manage our own database. zero operations no need to manage servers
 
 From a developer's perspective this is awesome, because it allows us to be more
 productive and focus on the domain logic of the app we're building.
 
-# Goals
+## Goals
 
-- What we're setting to achieve in this tutorial.
+What we're setting to achieve in this tutorial:
 
-build Repo Aggregator
-The plan is to present the full life cycle. I want it to be a step-by-step
-tutorial where the reader follows along and ends up with the exact same GitHub
-repo/app.
+- build a pre-rendered Repo Catalogue site with Nuxt.js
+- helper app that we'll use to seed Fauna's database
 
-In this tutorial, we'll build that lists
-our access the details page of each repo
+In this tutorial, we'll build that lists our access the details page of each
+repo
 
 Although it's not the main goal of the article, we'll also be building a
 supporting `fauna-seeder` app that will allows us to populate the FaunaDB
-database with data from the with a single command from the terminal.
-It just serves as a way of storing data in FaunaDB - in fact, you could
-be doing with different
+database with data from the with a single command from the terminal. It just
+serves as a way of storing data in FaunaDB - in fact, you could be doing with
+different
 
 ## Pre-requisites
 
-Before you continue reading this article, I’d like to mention that a working knowledge of the following technologies (or substitutes) are beneficial:
+Before you continue reading this article, I’d like to mention that a working
+knowledge of the following technologies (or substitutes) are beneficial:
+
+- JavaScript
+- Vue/Nuxt
+- GraphQL
+
+The plan is to present the full life cycle. I want it to be a step-by-step
+tutorial where the reader follows along and ends up with the exact same GitHub
+repo/app.
 
 Before you begin this guide you'll need the following:
 
@@ -112,71 +119,83 @@ Before you begin this guide you'll need the following:
 
 Let's get started!
 
-# Modelling our data
+## Modelling our data
 
-Now, focusing on the data model.
-Start by identifying the data
+First things first, we begin by specifying the data model. The goal is to store
+a collection of repos. Start by identifying the data and **dynamic** **static**
+(data that will be stored in Fauna). Is that it's not supposed to change
 
-entity Repo the following properties:
+The Repo entity has the **static** following properties:
 
-- a project name
-- the project's GitHub repo URL
-- svgLogo from simpleIcons
-- hexa main color (also coming from simpleIcons)
+- project name
+- project's GitHub repo URL
+- the project's logo
+- the project's main color in hexa
 
-FaunaDB is a non-relational database we can store data in the form of JSON
-documents There's two ways of accessing Fauna data:
+## Writing the GraphQL schema
 
-- APIs
-- shell
-
-## Writing GraphQL Schema
-
-Introduction to the step. What are we going to do and why are we doing it?
 Resource on writing schema
 
-In this section, we'll be creating the helper app `fauna-seeder` that we will use to populate
-Fauna. This where we'll also keep the GraphQL schema.
+In this section, we'll be creating a helper app `fauna-seeder` that we will be
+responsible for populating Fauna's database.
 
-"GraphQL also uses a typed schema."
+It will also contain the GraphQL schema that represents and will be used to
+create the database and what resources the database will provide.
 
 > "GraphQL is a specification for an API query language and a server engine
-> capable of executing such queries."[]()
+> capable of executing such queries."[Production Ready GraphQL](https://book.productionreadygraphql.com/)
 
-"As a first step, create a project directory and navigate into it:"
+To begin, create a directory for the project and navigate to it:
 
 ```shell
 mkdir fauna-seeder
 cd fauna-seeder
 ```
 
-"From within the project directory root, run the following commands":
+From within the root directory, create a new git repo:
 
 ```shell
 git init
 ```
 
-"And then add a .gitignore file to ignore the node_modules directory:"
+Make git ignore the `node_modules` directory and the `.env` file:
 
 ```shell
 echo "node_modules" > .gitignore
 echo ".env" >> .gitignore
 ```
 
-"Then let's add an empty package.json file:"
-"Next, initialize a TypeScript project and add the Prisma CLI as a development dependency to it:"
+Then, let's initialize a Node project
 
 ```shell
 npm init -y
 ```
 
+by adding an empty package.json file:
 "This creates a package.json with an initial setup for your TypeScript app."
 
-https://www.youtube.com/watch?v=KlUPiQaTp0I
-FaunaDB has a native GraphQL layer
-"allows you to import a graphql shcema and get an instant graphql endpoint"
+add the Prisma CLI as a development dependency to it:"
 
-Let's begin by writing our GraphQL schema. Add the following to `schemal.graphql`:
+install the required dependencies:
+
+```shell
+npm install dotenv faunadb simple-icons
+```
+
+- faunadb: JavaScript client
+  FQL the native API for querying the data
+  FQL functional, composable
+- simple-icons
+- dotenv to read Fauna's key
+
+https://www.youtube.com/watch?v=KlUPiQaTp0I
+FaunaDB has a native GraphQL layer.
+That allows you to import a graphql shcema and get an "instant" graphql endpoint
+
+"GraphQL also uses a typed schema."
+
+Let's begin by writing our GraphQL schema. Create a new file `schemal.graphql`
+and add the following:
 
 ```shell
 touch schema.gql
@@ -195,49 +214,37 @@ type Query {
 }
 ```
 
-One entity `Repo`
+We've declared the entity `Repo` to represent an individual repository in the
+collection.
 
-A repo has project name, a repository url, and svg logo. `@unique` defines
+A repo has project name, a repository URL, and a SVG logo. `@unique` defines
 that?attributes? doesn't allow to store repos with the same same or the same
 repo url
 
-Then we also added a query, we want a list off all repos that are store in the
-database `allRepos`
-This is the “hello world” of GraphQL. A query that asks for all the repositories.
-In this query, me and name are referred to as fields.
+We've also added a query, we want a list off all repos that are store in the
+database `allRepos`, A query that asks for all the repositories.
 
 ## Creating the database
 
-Introduction to the step. What are we going to do and why are we doing it?
+Login to your Fauna account.
 
-Login to your account
-
-"From here, we’ll log into FaunaDB and create our first data set. We’ll start by
-creating a new Database called “bookmarks.” Inside a Database, we have"
-Collections, Documents and Indexes.
-Create a new database which we will call `repos`.
+We’ll start by creating a new database called `repos`. Inside a Fauna database,
+we have Collections, Documents and Indexes.
 
 SCREENSHOT
-
-Before moving on to the next section
 
 ## Importing the schema
 
-Introduction to the step. What are we going to do and why are we doing it?
-feature that allows us to import a schema:
+Now that the database is created, we can import our schema feature that allows
+us to import a schema:
 
-- Import the schema
-  printscreen
-  Fauna will make the collections, the indexes that are necessary
+Import schema in Fauna "You can upload your schema.gql file via the FaunaDB
+Console by clicking“GraphQL” on the left sidebar, and then click the “Import
+Schema” button."
 
-- Setting an index for the slug
-- Defining the queries that will be used:
+**PRINTSCREEN**
 
-Import schema in Fauna
-"You can upload your schema.gql file via the FaunaDB Console by clicking
-“GraphQL” on the left sidebar, and then click the “Import Schema” button."
-
-SCREENSHOT
+Fauna will make the collections, the indexes that are necessary
 
 "Upon providing FaunaDB with a GraphQL schema, it automatically creates the
 required collections for the entities in our schema (products and reviews).
@@ -245,46 +252,40 @@ Besides that, it also creates the indexes that are needed to interact with those
 collections in a meaningful and efficient manner. You should now be presented
 with a GraphQL playground where you can test out"
 
-At this point we have an empty database, which we'll next be populating with
-some data
+At this point we have an empty database, ready to be populated with some repo
+data.
 
 ## Seeding data to Fauna
 
-Introduction to the step. What are we going to do and why are we doing it?
+FaunaDB is a non-relational database that stores data in the form of JSON
+documents. There are two ways of accessing Fauna data:
 
-Get back to our `fauna-seeder` to add the data
+- Fauna clients
+- Interactive shell
 
-Feel free to tweak this file to reflect your favorite projects:
-
-"This creates the basis for the information we’ll need to pull from our bookmarks
-as well as provides us with our first set of data to pull into our template."
-
-"you can use JSON data files or JavaScript data files. By utilizing a JavaScript
-file, we can actually make our API calls and return the data directly into a
-template."
-
-install the dependencies:
-
-```shell
-npm install dotenv faunadb simple-icons
-```
-
-https://simpleicons.org/?q=eleve
-
-- `dotenv`
+Now that we've created the database and imported the GraphQL schema, Get back to
+our `fauna-seeder` to add the data
+the basis for the information we’ll need to pull from the `repos` collection
+to generate the static routes in the Nuxt.js app.
 
 Go to Fauna's console and from the Security menu create a new key with the admin role
 and name it FAUNA_ADMIN
 
-create .env file and copy the generated key:
+**PRINTSCREEN**
+
+Create a `.env` file:
 
 ```shell
 touch .env
 ```
 
+Paste the generated key directly after the variable's name:
+
 ```
 FAUNA_ADMIN=
 ```
+
+Let's create a function that and export a client connection to Fauna:
 
 ```shell
 mkdir functions
@@ -292,7 +293,7 @@ cd functions
 touch db-connection.js
 ```
 
-Once everything is installed, let's go ahead and `db-connection.js`:
+Let's go ahead and export `db-connection.js`:
 
 ```javascript
 require("dotenv").config();
@@ -313,19 +314,27 @@ exports.client = createClient();
 exports.query = query;
 ```
 
-## Write data into the database
+What are we doing there
+
+## JSON data
+
+Next, you can use JSON data files. By utilizing a JavaScript file JSON, or
+JavaScript Object Notation, is a minimal, readable format for structuring data.
+This file contains a list of repos
 
 Create a `data.json` file containing the array of repos that we will seed to
 Fauna's database:
 
-- SimpleIcons name, that will allow the seeder
-  the format the file an array of objects, representing a repo each.
-  A repo has three properties:
+https://simpleicons.org/?q=eleve
 
 - project title
 - repo url
 - name in Simple Icons (use their website to get the names of the projects you'd like)
   and replace with your favorite projects.
+
+  - SimpleIcons name, that will allow the seeder
+    the format the file an array of objects, representing a repo each.
+    A repo has three properties:
 
 ```json
 [
@@ -337,14 +346,10 @@ Fauna's database:
 ]
 ```
 
+Feel free to tweak this file to reflect your favorite projects:
 Fell free to create this data with your the repos of your choice,
 just make sure the `simpleIconsName` value matches
 https://simpleicons.org/
-
-Client JS
-FQL the native API for querying the data
-FQL functional, composable
-We’re going to use a tool `faunadb`.
 
 From the project's root
 Create a new file `seed.js`:
@@ -386,7 +391,7 @@ client
   .catch((err) => console.log("Failed to add repo to FaunaDB", err));
 ```
 
-# Creating and configuring our Nuxt.js app
+## Creating and configuring our Nuxt.js app
 
 Introduction to the step. What are we going to do and why are we doing it?
 "To get started quickly,"
@@ -402,8 +407,8 @@ npx create-nuxt-app repo-aggregator
 - dotenv
 - bulma
 
-Let's also install the required dependencies:
-Fauna driver we've used to populate the database in the seeder app.
+Let's also install the required dependencies: Fauna driver we've used to
+populate the database in the seeder app. and slugify will allows us to slug
 
 ```
 npm install faunadb slugify
@@ -613,7 +618,7 @@ mounted() {
 }
 ```
 
-# Conclusion
+## Conclusion
 
 In this article we've learned
 
@@ -621,17 +626,25 @@ In this article we've learned
 
 static website that you can deploy on your host of choice.
 
-One of the key ideas I want to present in this article is that it doesn't always
-have to be a matter of A/B decision. We should aim for a "hybrid" solution
-whenever possible, where we pre-render the most we can, and asynchronously fetch
-just the data we need.
+We've also covered One of the key ideas I want to present in this article is
+that it doesn't always have to be a matter of A/B decision. We should aim for a
+"hybrid" solution whenever possible, where we pre-render the most we can, and
+asynchronously fetch just the data we need.
 
-## What to do next:
+https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/
+"It’s usually a good idea to load as much data at build time as possible to
+improve page performance. But if the data isn’t needed by all clients, or too
+big to be sent to the client all at once, we can split things up and switch to
+on-demand loading on the client. This is the case for user-specific data,
+pagination, or any data that changes rather frequently and might be outdated by
+the time it reaches the user.
+
+### What to do next:
 
 "Interested in getting the code? You can grab it on Github! Take a look at the
 finished product here."
 
-## Acknowledgements
+### Acknowledgements
 
 [Webhooks on content change]
 
@@ -646,13 +659,6 @@ https://css-tricks.com/consistent-backends-and-ux-why-should-you-care/?utm_sourc
 https://fauna.com/blog/building-a-serverless-jamstack-app-with-faunadb-cloud-part-1
 https://github.com/netlify/netlify-faunadb-example
 https://www.netlify.com/blog/2018/07/09/building-serverless-crud-apps-with-netlify-functions-faunadb/
-https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/
-"It’s usually a good idea to load as much data at build time as possible to
-improve page performance. But if the data isn’t needed by all clients, or too
-big to be sent to the client all at once, we can split things up and switch to
-on-demand loading on the client. This is the case for user-specific data,
-pagination, or any data that changes rather frequently and might be outdated by
-the time it reaches the user.
 
 In this article, we implemented an approach that loads part of the data at build
 time, and then loads the rest of the data in the frontend as the user interacts
