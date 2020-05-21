@@ -1,22 +1,14 @@
 ## Intro
 
 In this article, we will build a Repository Catalogue, using Nuxt.js to generate
-a static site with data being fetched from FaunaDB, at build time.
+a static site from data being fetched from a FaunaDB database, at build time.
 
-But
-pre-rendering is not all we will be doing. We will also to load the details of a
-client-side hydration
+Pre-rendering is not all we will be doing. We will also to load additional, more
+dynamic repo info, using Vue.js for client-side hydration.
 
 The main idea I want to present is the benefit of being able to fetch data from
 a database and use it to build a static/pre-rendered site that can be served
 directly from a CDN. Jamstack approach
-
-Let's imagine we have a Film catalogue. It's not that often that we need to add
-or delete a Film from the catalogue. Do we need to have a server query a
-database at each client request? Couldn't we pass the heavy lifting to the build
-process?
-
-"The primary focus will be on"
 
 ## Why a Repository Catalogue?
 
@@ -25,6 +17,11 @@ stay updated. our list of favorite projects to follow overview of the GitHub
 repositories you're interested in, and displaying the information that is more
 relevant to you In this example, we'll display the GitHub stars and the date of
 last commit.
+
+Let's imagine we have a Repo Catalogue of GitHub projects we would like to keep
+track of. It's not that often that we need to add or delete a Film from the
+catalogue. Do we need to have a server query a database at each client request?
+Couldn't we pass the heavy lifting to the build process?
 
 only some have a special place in your heart and that does not happen every day.
 
@@ -41,6 +38,14 @@ scalable, faster websites.
 The term "static" can be a bit misleading - that's why I like to use
 "pre-rendered" interchangeably. When we build a Jamstack app, it doesn't mean we
 have to compromise on dynamic data.
+
+https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/
+"It’s usually a good idea to load as much data at build time as possible to
+improve page performance. But if the data isn’t needed by all clients, or too
+big to be sent to the client all at once, we can split things up and switch to
+on-demand loading on the client. This is the case for user-specific data,
+pagination, or any data that changes rather frequently and might be outdated by
+the time it reaches the user.
 
 The widespread of functionality APIs makes way for common tasks - such as
 authentication, e-commerce, and data storage - that used to be implemented over
@@ -224,7 +229,7 @@ repo url
 We've also added a query, we want a list off all repos that are store in the
 database `allRepos`, A query that asks for all the repositories.
 
-## Creating the database
+## Creating a Fauna database
 
 Login to your Fauna account.
 
@@ -316,50 +321,55 @@ exports.query = query;
 
 What are we doing there
 
-## JSON data
+## Repo data
 
-Next, you can use JSON data files. By utilizing a JavaScript file JSON, or
-JavaScript Object Notation, is a minimal, readable format for structuring data.
-This file contains a list of repos
+We'll be using JSON to store the minimal set of repo data the seeder
+app requires.
 
-Create a `data.json` file containing the array of repos that we will seed to
-Fauna's database:
-
-https://simpleicons.org/?q=eleve
-
-- project title
-- repo url
-- name in Simple Icons (use their website to get the names of the projects you'd like)
-  and replace with your favorite projects.
-
-  - SimpleIcons name, that will allow the seeder
-    the format the file an array of objects, representing a repo each.
-    A repo has three properties:
+Each repo is represented by the three properties:
 
 ```json
-[
-  {
-    "projectName": "Vue.js",
-    "repoUrl": "https://github.com/vuejs/vue",
-    "simpleIconsName": "Vue.js"
-  }
-]
+{
+  "projectName": "Vue.js",
+  "repoUrl": "https://github.com/vuejs/vue",
+  "simpleIconsName": "Vue.js"
+}
 ```
 
-Feel free to tweak this file to reflect your favorite projects:
-Fell free to create this data with your the repos of your choice,
-just make sure the `simpleIconsName` value matches
-https://simpleicons.org/
+- project **name**
+- GitHub **repo URL**
+- Simple Icons **brand title**
 
-From the project's root
-Create a new file `seed.js`:
+[SimpleIcons](https://simpleicons.org/) is a cool project that collects SVG
+icons and colors for popular brands.
+
+We'll be using the [simple-icons](https://github.com/simple-icons/simple-icons)
+npm package - which we've installed in a previous step - to dynamically fetch
+the SVG logo and the hex color code of each project, when the seeder app runs.
+
+Create a `data.json` file:
+
+```shell
+touch data.json
+```
+
+Add the array of repos that will be written to Fauna's database using the format
+shown above. You can either use the same file I've used or tweak it with your
+favorite projects:
+
+Make sure the `simpleIconsName` value exists an
+https://simpleicons.org/
+You can use their website to get the names of the projects you'd like.
+
+## Running the seeder app
+
+Create a file named `seed.js`:
 
 ```shell
 touch seed.js
 ```
 
-This will be file that we will be running to populate the `Repo`
-collection.
+This is the code that we will run to populate the `Repo` collection:
 
 ```javascript
 const { client, query } = require("./functions/db-connection");
@@ -391,34 +401,51 @@ client
   .catch((err) => console.log("Failed to add repo to FaunaDB", err));
 ```
 
-## Creating and configuring our Nuxt.js app
+Let's break down what we've done:
 
-Introduction to the step. What are we going to do and why are we doing it?
-"To get started quickly,"
-"We will start by initializing the project with the Nuxt.js create app template."
+We're ready to write the repo data to Fauna:
+ready to add documents to our collection
 
 ```shell
-npx create-nuxt-app repo-aggregator
+node seed.js
 ```
 
-"Navigate through the guide and select the following options:"
+! Navigate to Fauna to confirm data was written successfully
 
-- Add axios module to make HTTP request easily into your application.
-- dotenv
-- bulma
+## Nuxt Repo Catalogue
 
-Let's also install the required dependencies: Fauna driver we've used to
-populate the database in the seeder app. and slugify will allows us to slug
+Now, let's change gears and look at the core app for this tutorial.
+
+To get started quickly, we will initialize the project with the Nuxt's
+scaffolding tool:
+
+```shell
+npx create-nuxt-app repo-catalogue
+```
+
+Go through the guide and make sure to select the following options:
+
+- axios and dotenv in Step
+- Bulma in Step "To style our app, we’ll be making use of Bulma.
+
+Let's also install the other required dependencies:
+
+- Fauna driver we've used to populate the database in the seeder app
+- slugify will allows us to slug
 
 ```
 npm install faunadb slugify
 ```
 
-### Env variables
+### Fauna Key
 
-First, we build
-our project in dev mode, in order to access the right local environment
-variables:
+This step is important to keep acessible when the generate Fauna's key private
+in order to access the right local environment variables:
+
+The same way we did it before, let's creat a Fauna key - this time with Server
+role
+and create
+use fetch data from the collection
 
 Go to the Fauna dashboard
 go to Security on the left-hand sidebar to manage the keys for the database
@@ -431,51 +458,17 @@ not going to be displayed again
 add the API key you've just generated `.env` file:
 
 ```
-FAUNA_ADMIN_KEY=
-```
-
-ready to add documents to our collection
-
-```
-node seed.js
-```
-
-"From here, we just need to . That’s where mapBookmarks() comes in!"
-
-## Nuxt Repo Catalogue
-
-We begin by invoking Nuxt's scaffolding tool:
-
-```shell
-npx create-nuxt-app repo-catalogue
-```
-
-First, we build our project in dev mode, in order to access the right local
-environment variables:
-
-.env: A dotenv file for defining environment variables (used for your database
-connection)
-
-Now `cd repo-catalogue`
-
-The same way we did it before, let's creat a Fauna key - this time with Server
-role
-
-and create
-use fetch data from the collection
-
-```
 FAUNA_SERVER_KEY=
 ```
 
-and edit `nuxt.config.js` the central point of a Nuxt
-app
+"From here, we just need to access `process.env.FAUNA_SERVER_KEY` in order to access the right local
+environment variables.
 
 ```javascript
 require("dotenv").config();
 ```
 
-Add the following to your nuxt.config.js:
+Add edit the following to your nuxt.config.js:
 
 ## Setting up the Project
 
@@ -514,35 +507,23 @@ generate: {
         }
       })
     }
-  }
+}
 ```
 
-Here's a quick overview of the different parts of the code snippet:
-Import the PrismaClient constructor from the @prisma/client node module
-Instantiate PrismaClient
-Define an async function called main to send queries to the database
-Call the main function
-Close the database connections when the script terminates
+Let’s break down the different steps of the code snippet:
 
-- Implementing the page layouts
-- Implementing the API calls
-
-Let’s break this down.
+- Import the PrismaClient constructor from the @prisma/client node module
+- Instantiate PrismaClient
+- Define an async function called main to send queries to the database
+- Call the main function
+- Return the database connections when the script terminates
 
 ## Creating our pages
 
-Introduction to the step. What are we going to do and why are we doing it?
-
-"To style our app, we’ll be making use of Bulma. Open nuxt.config.js and paste
-the code below within the link object that is inside the head object:"
-
-Site will have 2 static pages:
+The Site will have two pages:
 
 - index.vue: where all repos will be listed
 - \_slug.vue: repo details page
-
-"Notice how the response and the query are of very similar shapes. A successful
-GraphQL response always has a data key"
 
 structure for our app. Our pages folder should look like this:
 
@@ -552,11 +533,11 @@ structure for our app. Our pages folder should look like this:
 │   └── _slug.vue
 ```
 
-Let's add some CSS to give some style to our app
-
 Start with `pages/index.vue` and replace it with:
 
-## Running nuxt generate
+Create the file `pages/repos/_slug.vue` and replace it with:
+
+## Running Nuxt generate
 
 Introduction to the step. What are we going to do and why are we doing it?
 
@@ -574,39 +555,38 @@ build your Nuxt.js project:
 npm run generate
 ```
 
-And that's it!
-"You have a working static"
+And that's it! You have now a working static site in the `dist` folder, that can
+be served directly from a CDN!
 
 ## Adding dynamic content to our Repo Catalogue
 
-Probably the main objection for static/pre-rendered sites is "I don't want to
-have to rebuild the entire site" every time something changes in the database.
+Probably the main objection to static sites is "I don't want to have to rebuild
+the entire site every time something changes in the database".
 
-- Addressing the argument "I don't want to have to rebuild my website every time
-  something changes in the database"
+It's a totally valid argument - a nuanced one nonetheless. For example, a
+Netlify hosted website won't have any downtime, while the build/deploy of a new
+version takes place.
 
-  Load the repo details at run time only for that repo
-  that's why everything is not static
+So what is the **real** downside? Maybe the time it takes to rebuild a website
+with large amounts of content. And even in that domain, we're starting to see
+amazing progress being made, e.g. Gatsby's recently announcing [incremental
+builds](https://www.gatsbyjs.org/blog/2020-04-22-announcing-incremental-builds/).
 
-It's a totally valid/comprehensible argument - a nuanced one nonetheless. For
-example, a Netlify hosted website won't have any downtime while the build/deploy
-of a new version takes place. So what is the **real** downside? Maybe the time
-it takes to rebuild a website with large amounts of content. And even in that
-area, we're starting to see amazing progress being made, e.g. Gatsby's recently
-announcing incremental builds.
+But still, there are certainly some scenarios where constantly rebuilding the
+site is not viable.
 
-But still, there are certainly some scenarios where constantly rebuilding is not
-viable. Going back to our Film example, let's imagine we have a real-time user
-rating of Films. Clearly, it's not practical to rebuild an entire website
-whenever a user rates a Film.
+Going back to our Repo Catalogue, suppose we want to add some dynamic data, such
+as stars and forks.
 
-Let's add some dynamic data to our Repo pages:
+Clearly, it's not practical to rebuild an entire website whenever this type of
+data changes.
 
-We'll be adding an asynchronous JavaScript API call to the Film page that gets
-back its rating.
+In this section, we'll be adding some dynamic data to our Repo detail pages.
+We'll be adding an asynchronous JavaScript API call to the GitHub API page that
+gets back its rating.
 
-Load this data on the client To load the data of a GitHub repo on the client, we
-have to add some code `/pages/repos/_slug.js`:
+The request for this data will be made client-side and we'll rely on Vue's
+reactivity to display, we have to add some code `/pages/repos/_slug.js`:
 
 ```javascript
 mounted() {
@@ -618,31 +598,33 @@ mounted() {
 }
 ```
 
+Now run generate again so that this client-side code is included in the app's
+bundle:
+
+```shell
+npm run generate
+```
+
 ## Conclusion
 
-In this article we've learned
+In this article we've built a Repo Catalogue static website that you can deploy
+on your host of choice.
 
-"The code for this tutorial can be found here."
+"In this article, we implemented an approach that loads part of the data at build
+time, and then loads the rest of the data in the frontend as the user interacts
+with the page."
 
-static website that you can deploy on your host of choice.
+"Interested in getting the code? You can grab it on Github! Take a look at the
+finished product here."
 
-We've also covered One of the key ideas I want to present in this article is
+"The code for this tutorial can be found here." `fauna-seeder` `repo-catalogue`
+
+We've also learned/seen covered One of the key ideas I want to present in this article is
 that it doesn't always have to be a matter of A/B decision. We should aim for a
 "hybrid" solution whenever possible, where we pre-render the most we can, and
 asynchronously fetch just the data we need.
 
-https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/
-"It’s usually a good idea to load as much data at build time as possible to
-improve page performance. But if the data isn’t needed by all clients, or too
-big to be sent to the client all at once, we can split things up and switch to
-on-demand loading on the client. This is the case for user-specific data,
-pagination, or any data that changes rather frequently and might be outdated by
-the time it reaches the user.
-
-### What to do next:
-
-"Interested in getting the code? You can grab it on Github! Take a look at the
-finished product here."
+### What to do next
 
 ### Acknowledgements
 
@@ -659,10 +641,6 @@ https://css-tricks.com/consistent-backends-and-ux-why-should-you-care/?utm_sourc
 https://fauna.com/blog/building-a-serverless-jamstack-app-with-faunadb-cloud-part-1
 https://github.com/netlify/netlify-faunadb-example
 https://www.netlify.com/blog/2018/07/09/building-serverless-crud-apps-with-netlify-functions-faunadb/
-
-In this article, we implemented an approach that loads part of the data at build
-time, and then loads the rest of the data in the frontend as the user interacts
-with the page."
 
 https://nuxtjs.org/blog/build-dev-to-clone-with-nuxt-new-fetch
 
