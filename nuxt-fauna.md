@@ -117,13 +117,9 @@ Let's get started!
 ## Modelling our data
 
 First things first, we begin by specifying the data model. The goal is to store
-a collection of repos.
+a collection of repos in the Fauna database.
 
-Is that it's not supposed to change
-Start by identifying the data and **dynamic** **static**
-(data that will be stored in Fauna)
-
-The Repo entity is made of the following properties:
+Each repo is represented by the following properties:
 
 - name
 - GitHub repo URL
@@ -134,8 +130,8 @@ The Repo entity is made of the following properties:
 
 Resource on writing schema
 
-In this section, we'll be creating a helper app `fauna-seeder` that we will be
-responsible for populating Fauna's database.
+In this section, we'll be creating the helper app `fauna-seeder` that will
+populate the database.
 
 It will also contain the GraphQL schema that represents and will be used to
 create the database and what resources the database will provide.
@@ -143,7 +139,7 @@ create the database and what resources the database will provide.
 > "GraphQL is a specification for an API query language and a server engine
 > capable of executing such queries."[Production Ready GraphQL](https://book.productionreadygraphql.com/)
 
-To begin, create a directory for the project and navigate to it:
+Create a directory for the project and navigate to it:
 
 ```shell
 mkdir fauna-seeder
@@ -156,41 +152,39 @@ From within the root directory, create a new git repo:
 git init
 ```
 
-Make git ignore the `node_modules` directory and the `.env` file:
+Configure git to ignore the `node_modules` directory and the `.env` file:
 
 ```shell
 echo "node_modules" > .gitignore
 echo ".env" >> .gitignore
 ```
 
-Then, let's initialize a Node project
+Then, let's initialize a Node project:
 
 ```shell
 npm init -y
 ```
 
-by adding an empty package.json file:
-"This creates a package.json with an initial setup for your TypeScript app."
+This creates a `package.json` file where we can install the required
+dependencies:
 
-add the Prisma CLI as a development dependency to it:"
+We've installed three dependencies:
 
-install the required dependencies:
+- faunadb: JavaScript driver for FaunaDB
+- simple-icons: [SimpleIcons](https://simpleicons.org/) npm package
+- dotenv: to store and load Fauna's secret key from a `.env` file
 
 ```shell
 npm install dotenv faunadb simple-icons
 ```
 
-- faunadb: JavaScript client
-  FQL the native API for querying the data
-  FQL functional, composable
-- simple-icons
-- dotenv to read Fauna's key
-
 https://www.youtube.com/watch?v=KlUPiQaTp0I
-FaunaDB has a native GraphQL layer.
-That allows you to import a graphql shcema and get an "instant" graphql endpoint
+FaunaDB has native GraphQL support that allows us to import a GraphQL schema and
+get an "instant" GraphQL endpoint.
 
 "GraphQL also uses a typed schema."
+
+FQL the native API for querying the data FQL functional, composable
 
 Let's begin by writing our GraphQL schema. Create a new file `schemal.graphql`
 and add the following:
@@ -219,22 +213,21 @@ A repo has project name, a repository URL, and a SVG logo. `@unique` defines
 that?attributes? doesn't allow to store repos with the same same or the same
 repo url
 
-We've also added a query, we want a list off all repos that are store in the
-database `allRepos`, A query that asks for all the repositories.
+We've also declared a query `allRepos`, to list off all repos that are stored in
+the database.
 
 ## Creating a Fauna database
 
-Login to your Fauna account.
+Log in to your Fauna account.
 
-We’ll start by creating a new database called `repos`. Inside a Fauna database,
-we have Collections, Documents and Indexes.
+Visit the [dashboard](https://dashboard.fauna.com/) and create a new database
+and name it `repos`.
 
-SCREENSHOT
+**PRINTSCREEN**
 
 ## Importing the schema
 
-Now that the database is created, we can import our schema feature that allows
-us to import a schema:
+Now that the database is created, we can import the GraphQL schema into FaunaDB.
 
 Import schema in Fauna "You can upload your schema.gql file via the FaunaDB
 Console by clicking“GraphQL” on the left sidebar, and then click the “Import
@@ -242,48 +235,50 @@ Schema” button."
 
 **PRINTSCREEN**
 
-Fauna will make the collections, the indexes that are necessary
+Inside a Fauna database, we have Collections, Indexes and Documents.
 
-"Upon providing FaunaDB with a GraphQL schema, it automatically creates the
-required collections for the entities in our schema (products and reviews).
-Besides that, it also creates the indexes that are needed to interact with those
-collections in a meaningful and efficient manner. You should now be presented
-with a GraphQL playground where you can test out"
+"FaunaDB automatically created the necessary collection for the `Repo` entity.
+Additionally, It also creates the indexes that to support the schema."
+
+"Besides that, it also creates the indexes that are needed to interact with
+those collections in a meaningful and efficient manner."
 
 At this point we have an empty database, ready to be populated with some repo
 data.
 
 ## Seeding data to Fauna
 
-FaunaDB is a non-relational database that stores data in the form of JSON
-documents. There are two ways of accessing Fauna data:
+FaunaDB is a non-relational database that stores data in the JSON format. There
+are two ways of interacting with Fauna data:
 
-- Fauna clients
-- Interactive shell
+- Fauna drivers (available in several programming languages)
+- Interactive shell using The Fauna Query Language (FQL)
+- GraphQL Playground
 
-Now that we've created the database and imported the GraphQL schema, Get back to
-our `fauna-seeder` to add the data
-the basis for the information we’ll need to pull from the `repos` collection
-to generate the static routes in the Nuxt.js app.
+We'll use the JavaScript [driver](https://github.com/fauna/faunadb-js), that
+we've already installed in a previous step.
 
-Go to Fauna's console and from the Security menu create a new key with the admin role
-and name it FAUNA_ADMIN
+The driver requires a Fauna Admin Key in order to guarantee that it has the
+correct permissions to access and write data in the `repos` database.
+
+Go to the Fauna dashboard and from the Security menu create a new key with the
+admin role, and name it `FAUNA_ADMIN`:
 
 **PRINTSCREEN**
 
-Create a `.env` file:
+Create a `.env` file in the root directory of the `fauna-seeder` app:
 
 ```shell
 touch .env
 ```
 
-Paste the generated key directly after the variable's name:
+Paste the generated key right after the variable's name:
 
 ```
 FAUNA_ADMIN=
 ```
 
-Let's create a function that and export a client connection to Fauna:
+Let's create a function that handles a client connection to Fauna:
 
 ```shell
 mkdir functions
@@ -291,7 +286,7 @@ cd functions
 touch db-connection.js
 ```
 
-Let's go ahead and export `db-connection.js`:
+Add the following to `db-connection.js`:
 
 ```javascript
 require("dotenv").config();
@@ -316,10 +311,10 @@ What are we doing there
 
 ## Repo data
 
-We'll be using JSON to store the minimal set of repo data the seeder
-app requires.
+We'll be using JSON to store the minimal set of repo data the seeder app
+requires.
 
-Each repo is represented by the three properties:
+Each repo is represented by three properties:
 
 ```json
 {
@@ -333,12 +328,12 @@ Each repo is represented by the three properties:
 - GitHub **repo URL**
 - Simple Icons **brand title**
 
-[SimpleIcons](https://simpleicons.org/) is a cool project that collects SVG
+[Simple Icons](https://simpleicons.org/) is a cool project that collects SVG
 icons and colors for popular brands.
 
-We'll be using the [simple-icons](https://github.com/simple-icons/simple-icons)
-npm package - which we've installed in a previous step - to dynamically fetch
-the SVG logo and the hex color code of each project, when the seeder app runs.
+We'll be using their [npm package](https://github.com/simple-icons/simple-icons)
+to dynamically fetch the SVG logo and the hex color code of each project, when
+the seeder app runs.
 
 Create a `data.json` file:
 
@@ -346,13 +341,13 @@ Create a `data.json` file:
 touch data.json
 ```
 
-Add the array of repos that will be written to Fauna's database using the format
-shown above. You can either use the same file I've used or tweak it with your
-favorite projects:
+Using the format shown above, add an array of repos that will be written to
+Fauna's database. You can either use the same file I've used or tweak it to
+feature your favorite projects.
 
-Make sure the `simpleIconsName` value exists an
-https://simpleicons.org/
-You can use their website to get the names of the projects you'd like.
+Make sure the `simpleIconsName` value exists in the Simple Icons collection. You
+can use the search feature on the [website](https://simpleicons.org/) to get the
+correct names of the projects you're adding.
 
 ## Running the seeder app
 
@@ -362,7 +357,7 @@ Create a file named `seed.js`:
 touch seed.js
 ```
 
-This is the code that we will run to populate the `Repo` collection:
+This is the code that will run to populate the `Repo` collection:
 
 ```javascript
 const { client, query } = require("./functions/db-connection");
@@ -394,7 +389,9 @@ client
   .catch((err) => console.log("Failed to add repo to FaunaDB", err));
 ```
 
-Let's break down what we've done:
+Let's break down what we've done there:
+
+## -
 
 We're ready to write the repo data to Fauna:
 ready to add documents to our collection
