@@ -261,6 +261,9 @@ we've already installed in a previous step.
 The driver requires a Fauna Admin Key in order to guarantee that it has the
 correct permissions to access and write data in the `repos` database.
 
+Go to the Fauna dashboard go to Security on the left-hand sidebar to manage the
+keys for the database Create a new key -> select the database you've just
+created, select the Role Admin you can name the key whatever you want and save
 Go to the Fauna dashboard and from the Security menu create a new key with the
 admin role, and name it `FAUNA_ADMIN`:
 
@@ -272,11 +275,16 @@ Create a `.env` file in the root directory of the `fauna-seeder` app:
 touch .env
 ```
 
+copy the secret key and save it as after you navigate away from this page it is
+not going to be displayed again
 Paste the generated key right after the variable's name:
 
 ```
 FAUNA_ADMIN=
 ```
+
+"From here, we just need to access `process.env.FAUNA_SERVER_KEY` in order to access the right local
+environment variables.
 
 Let's create a function that handles a client connection to Fauna:
 
@@ -391,79 +399,69 @@ client
 
 Let's break down what we've done there:
 
-## -
-
-We're ready to write the repo data to Fauna:
-ready to add documents to our collection
+We're ready to add documents to the `Repo` collection:
 
 ```shell
 node seed.js
 ```
 
-! Navigate to Fauna to confirm data was written successfully
+Navigate to "Collections" from the sidebar menu, and confirm that the data was
+written successfully.
+
+**PRINTSCREEN**
 
 ## Nuxt Repo Catalogue
 
-Now, let's change gears and look at the core app for this tutorial.
+Now, let's change gears and look at this tutorial's core app.
 
-To get started quickly, we will initialize the project with the Nuxt's
-scaffolding tool:
+To get started quickly, we'll initialize the project using Nuxt's scaffolding
+tool:
 
 ```shell
 npx create-nuxt-app repo-catalogue
 ```
 
-Go through the guide and make sure to select the following options:
+Go through the steps and select the following options:
 
-- axios and dotenv in Step
-- Bulma in Step "To style our app, we’ll be making use of Bulma.
+- axios and dotenv in the modules step
+- Bulma in the UI framework step
 
-Let's also install the other required dependencies:
+Once the tool finishes creating our Nuxt app, install also the other required
+dependencies:
 
-- Fauna driver we've used to populate the database in the seeder app
-- slugify will allows us to slug
+- faunadb: JavaScript driver for FaunaDB
+- slugify: to generate slugs from repo names
 
 ```
 npm install faunadb slugify
 ```
 
-### Fauna Key
+### Fauna key
 
-This step is important to keep acessible when the generate Fauna's key private
-in order to access the right local environment variables:
+The same way we did for the `fauna-seeder` app, let's create a Fauna key - this
+time with "Server" role, fetch data from the collection.
 
-The same way we did it before, let's creat a Fauna key - this time with Server
-role
-and create
-use fetch data from the collection
+**PRINTSCREEN**
 
-Go to the Fauna dashboard
-go to Security on the left-hand sidebar to manage the keys for the database
-Create a new key -> select the database you've just created, select the Role
-Admin you can name the key whatever you want and save
-
-copy the secret key and save it as after you navigate away from this page it is
-not going to be displayed again
-
-add the API key you've just generated `.env` file:
+Edit the `.env` file and paste the key you've just generated.
 
 ```
 FAUNA_SERVER_KEY=
 ```
 
-"From here, we just need to access `process.env.FAUNA_SERVER_KEY` in order to access the right local
-environment variables.
+In the top of `nuxt.config.js` require and configure dotenv:
 
 ```javascript
 require("dotenv").config();
 ```
 
-Add edit the following to your nuxt.config.js:
+## Routes and Nuxt generate
 
-## Setting up the Project
+Talk a bit about `nuxt generate`.
 
 Add after build, property the generate:
 routes function
+Add edit the following to your `nuxt.config.js`:
 
 ```javascript
 generate: {
@@ -500,7 +498,7 @@ generate: {
 }
 ```
 
-Let’s break down the different steps of the code snippet:
+It's quite some code. So, let’s break down the different steps of the snippet:
 
 - Import the PrismaClient constructor from the @prisma/client node module
 - Instantiate PrismaClient
