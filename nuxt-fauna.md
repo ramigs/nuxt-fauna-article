@@ -1,43 +1,36 @@
 ## Intro
 
 In this article, we will build a Repository Catalogue, using Nuxt.js to generate
-a static site from data being fetched from a FaunaDB database, at build time.
+a static site from data from a FaunaDB database, at build time.
 
 Pre-rendering is not all we will be doing. We will also to load additional, more
 dynamic repo info, using Vue.js for client-side hydration.
+
+## Why a Repository Catalogue?
+
+As developers, we all have projects we admire/find interesting/look up to and
+like to keep track of.
+
+The Repository Catalogue will serve as a collection of favorite GitHub projects
+to follow overview, and displaying the information that is more relevant to you.
 
 The main idea I want to present is the benefit of being able to fetch data from
 a database and use it to build a static/pre-rendered site that can be served
 directly from a CDN. Jamstack approach
 
-## Why a Repository Catalogue?
-
-As developers, we all have a some projects we admire and like to keep track and
-stay updated. our list of favorite projects to follow overview of the GitHub
-repositories you're interested in, and displaying the information that is more
-relevant to you In this example, we'll display the GitHub stars and the date of
-last commit.
-
-Let's imagine we have a Repo Catalogue of GitHub projects we would like to keep
-track of. It's not that often that we need to add or delete a Film from the
-catalogue. Do we need to have a server query a database at each client request?
-Couldn't we pass the heavy lifting to the build process?
-
-only some have a special place in your heart and that does not happen every day.
-
-At the end of the tutorial, you/When we finish, you'll be able to take this
-example, translate and apply it to your specific use case. "You can also adapt
-this tutorial context for other real-time apps very easily."
+At the end, you'll be able to take this example, adapt and apply it to your
+specific use case. You can also translate this tutorial context for other
+real-time apps very easily, which we'll discuss later.
 
 ## Jamstack
 
 The concept of Jamstack is not new and its advantages have been extensively
-documented before. Jamstack architectures allow us to build more secure, more
-scalable, faster websites.
+documented before. Jamstack architectures allow us to build more performant,
+more secure, and more scalable websites.
 
 The term "static" can be a bit misleading - that's why I like to use
 "pre-rendered" interchangeably. When we build a Jamstack app, it doesn't mean we
-have to compromise on dynamic data.
+have to compromise on dynamic features or dynamic data.
 
 https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/
 "It’s usually a good idea to load as much data at build time as possible to
@@ -49,7 +42,7 @@ the time it reaches the user.
 
 The widespread of functionality APIs makes way for common tasks - such as
 authentication, e-commerce, and data storage - that used to be implemented over
-and over, now be delegated to the experts of those specific domains.
+and over again, now be delegated to the experts of those specific domains.
 
 distinguishing static data and real-time data
 
@@ -64,26 +57,28 @@ Using the server side build to get the webmentions provides multiple benefits:
 
 ## Nuxt.js
 
-Nuxt.js is well known for SSR capabilites
-but it can also go static.
+Nuxt.js is an MIT-licensed, open-source web application framework built on top
+of Vue.js. It is well known for its SSR capabilities, but it can also do static.
 
-- Couple of paragraphs introducing Nuxt.js and FaunaDB.
-- The Jamstack and how Nuxt.js (SSG) and FaunaDB (serverless) relate to it.
+We'll be using Nuxt to do the heavy lifting during the build stage. Instead of
+having to at each client request?
 
-This is one of the key points I want to concentrate on. Do we really need to
-have a server make the same request, to get the same data, take those same
-results, run them against a templating engine and only then deliver the response
-to the client?
+The reason for static ... Do we really need to have a server make the same
+request, to get the same data, take those same results, run them against a
+templating engine and only then deliver the response to the client?
+
+It's not that often that we need to add or delete a repo from the catalogue.
+only some have a special place in your heart and that does not happen every day.
 
 ## FaunaDB
 
-FaunaDB is a globally "distributed database that promises to be always
-consistent, always secure, low-latency" Plus, a Fauna database scales
-automatically and it's globally distributed.
+FaunaDB is a globally distributed, low-latency database that promises to be
+always consistent and always secure.
 
-As a **serverless** database, FaunaDB allows our applications to access data "as
-a service". Contrary to more "traditional" databases, there's no need to host
-and manage our own database. zero operations no need to manage servers
+As a serverless database, FaunaDB allows our applications to access data "as a
+service". Contrary to more "traditional" relational databases, there's no need
+to host and manage our own database. zero operations no need to manage servers
+and scales automatically
 
 From a developer's perspective this is awesome, because it allows us to be more
 productive and focus on the domain logic of the app we're building.
@@ -92,32 +87,27 @@ productive and focus on the domain logic of the app we're building.
 
 What we're setting to achieve in this tutorial:
 
-- build a pre-rendered Repo Catalogue site with Nuxt.js
-- helper app that we'll use to seed Fauna's database
+- building a pre-rendered Repo Catalogue site with Nuxt.js
+- building a helper app that we'll use to seed Fauna's database
 
-In this tutorial, we'll build that lists our access the details page of each
-repo
-
-Although it's not the main goal of the article, we'll also be building a
-supporting `fauna-seeder` app that will allows us to populate the FaunaDB
-database with data from the with a single command from the terminal. It just
-serves as a way of storing data in FaunaDB - in fact, you could be doing with
-different
+Although it's not the main focus of the article, the supporting `fauna-seeder`
+app that will allows us to populate the FaunaDB database with a single command
+from the terminal. It's just one a way of storing data in FaunaDB - in fact, you
+could be doing with different ways.
 
 ## Pre-requisites
 
-Before you continue reading this article, I’d like to mention that a working
-knowledge of the following technologies (or substitutes) are beneficial:
+Before we move on, I’d like to mention that although not mandatory, a working
+knowledge of the following technologies is beneficial:
 
 - JavaScript
-- Vue/Nuxt
+- Vue.js/Nuxt.js
 - GraphQL
 
-The plan is to present the full life cycle. I want it to be a step-by-step
-tutorial where the reader follows along and ends up with the exact same GitHub
-repo/app.
+This will be a complete step-by-step tutorial, where the reader follows along
+and ends up with the exact same site.
 
-Before you begin this guide you'll need the following:
+Before you begin, you'll need:
 
 - Node and npm installed
 - A [FaunaDB account](https://dashboard.fauna.com/accounts/register)
@@ -127,15 +117,18 @@ Let's get started!
 ## Modelling our data
 
 First things first, we begin by specifying the data model. The goal is to store
-a collection of repos. Start by identifying the data and **dynamic** **static**
-(data that will be stored in Fauna). Is that it's not supposed to change
+a collection of repos.
 
-The Repo entity has the **static** following properties:
+Is that it's not supposed to change
+Start by identifying the data and **dynamic** **static**
+(data that will be stored in Fauna)
 
-- project name
-- project's GitHub repo URL
-- the project's logo
-- the project's main color in hexa
+The Repo entity is made of the following properties:
+
+- name
+- GitHub repo URL
+- SVG logo
+- main color hex code
 
 ## Writing the GraphQL schema
 
@@ -397,7 +390,7 @@ client
       )
     )
   )
-  .then(console.log("Repos seeded successfully in FaunaDB"))
+  .then(console.log("Repos seeded successfully to FaunaDB"))
   .catch((err) => console.log("Failed to add repo to FaunaDB", err));
 ```
 
