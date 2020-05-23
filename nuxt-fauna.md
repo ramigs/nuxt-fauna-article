@@ -28,10 +28,12 @@ JavaScript. sprinkle it with just the more dynamic type of data.
 > pagination, or any data that changes rather frequently and might be outdated by
 > the time it reaches the user. _[Build a dynamic JAMstack app with GatsbyJS and FaunaDB](https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/)_
 
-When analyzing the requirements for a Repo Catalogue, right away we can identify
-two categories of data: some that changes frequently (e.g., number of stars and
-forks); and some that does not change often or not at all (e.g., project name,
-SVG logo, repo URL).
+When analyzing the requirements for a Repo Catalogue, we can straight away
+identify two categories of data:
+
+- some that does not change often or not at all (e.g., project name, SVG logo,
+  repo URL)
+- some that changes frequently (e.g., number of stars and forks)
 
 This observation may then lead us to the question:
 
@@ -55,6 +57,13 @@ The concept of Jamstack is not new and its advantages have been extensively
 documented before. Jamstack architectures allow us to build more performant,
 more secure, and more scalable websites.
 
+With HTML being pre-rendered once and then statically served from a CDN, the
+performance for users is much better.
+"Much less API calls are made, requiring much less computing time and power"
+
+It allows to fetch data only when building the site, which should be less often
+than visitors viewing pages.
+
 The term "static" can be a bit misleading - that's why we see "pre-rendered"
 being used interchangeably. When we build a Jamstack app, it doesn't mean we
 have to compromise on dynamic features or dynamic data.
@@ -66,23 +75,6 @@ and over, now be delegated to the experts of those specific domains.
 https://nicolas-hoizey.com/articles/2020/05/05/jamstack-is-fast-only-if-you-make-it-so/
 Using the server side build to get the provides multiple benefits:
 
-- The performance for the users is much better, with HTML already computed on the server and statically served
-- Much less API calls are made, requiring much less computing time and power
-  distinguishing static data and real-time data
-
-It allows to call webmentio.io API only when building the site, which should be
-less often than visitors viewing pages
-
-directly from a CDN
-
-## Nuxt.js
-
-Nuxt.js is an open-source web application framework built on top of Vue.js. It
-is well known for its SSR capabilities, but it can also do static.
-
-We'll be using Nuxt to do the heavy lifting during the build stage. Instead of
-having to at each client request?
-
 ## FaunaDB
 
 FaunaDB is a globally distributed, low-latency database that promises to be
@@ -90,11 +82,20 @@ always consistent and always secure.
 
 As a serverless database, FaunaDB allows our applications to access data "as a
 service". Contrary to more "traditional" relational databases, there's no need
-to host and manage our own database. zero operations no need to manage servers
-and scales automatically
+to host and manage our own database. Zero server operations and automatic
+scalability out-of-the-box.
 
 From a developer's perspective this is awesome, because it allows us to be more
-productive and focus on the domain logic of the app we're building.
+productive and focus on the business logic of the app we're building.
+
+## Nuxt.js
+
+Nuxt.js is an open-source web application framework built on top of Vue.js. It
+is well known for its SSR capabilities, but it can also do static.
+
+Instead of having a Node serve to process each client request - fetching data
+from an API or database in between, we'll be using Nuxt as a static site
+generator to do the heavy lifting during the build stage.
 
 ## Goals
 
@@ -685,14 +686,13 @@ on a host of your choice.
 "we implemented an approach that loads part of the data at build time, and then
 loads the rest of the data in the frontend as the user interacts with the page."
 
-"Interested in getting the code? You can grab it on Github!
+"The code for this tutorial can be found here the GitHub repos." `fauna-seeder`
+`repo-catalogue`
 
-"The code for this tutorial can be found here." `fauna-seeder` `repo-catalogue`
-
-We've also learned/seen covered One of the key ideas I want to present in this article is
-that it doesn't always have to be a matter of A/B decision. We should aim for a
-"hybrid" solution whenever possible, where we pre-render the most we can, and
-asynchronously fetch just the data we need.
+We've also learned/seen covered One of the key ideas I want to present in this
+article is that it doesn't always have to be a matter of A/B decision. We should
+aim for a "hybrid" solution whenever possible, where we pre-render the most we
+can, and asynchronously fetch just the data we need.
 
 ### What to do next
 
