@@ -1,22 +1,36 @@
-## Intro
+# Building a static Nuxt.js site with FaunaDB
 
 In this article, we will build a Repository Catalogue, using Nuxt.js to generate
-a static site from data from a FaunaDB database, at build time.
+a static site, from FaunaDB data.
 
-Pre-rendering is not all we will be doing. We will also to load additional, more
-dynamic repo info, using Vue.js for client-side hydration.
+Pre-rendering at build time is not all we will be doing. We will also display
+additional, more dynamic repo info, using Vue.js for client-side hydration.
+
+Check out the finished product [here](https://elegant-hopper-28219e.netlify.app/).
 
 ## Why a Repository Catalogue?
 
-As developers, we all have projects we admire/find interesting/look up to and
+As developers, we all have projects we admire/find interesting/look up to, and
 like to keep track of.
 
-The Repository Catalogue will serve as a collection of favorite GitHub projects
-to follow overview, and displaying the information that is more relevant to you.
+The Repository Catalogue will serve as a collection of GitHub projects, that you
+can customize to display repo information that is more relevant to you.
 
-The main idea I want to present is the benefit of being able to fetch data from
-a database and use it to build a static/pre-rendered site that can be served
-directly from a CDN. Jamstack approach
+Although we'll be using a very concrete example implementation, the main
+underlying idea presented is the benefit of pre-rendering static site being able
+to fetch data from a database and use it to build a static/pre-rendered site
+that can be served directly from a CDN.
+
+After all, it's not _that_ often we need to add or delete a repo from the
+catalogue. only some have a special place in your heart and that does not happen
+every day.
+
+so right away we see two categories of data, some that changes frequently and
+some that does not. What if we?
+
+Making us question: "Do we really need to keep makimg the same request, to get
+the same data, take those same results, run them against a templating engine and
+only then deliver the response to the client?
 
 At the end, you'll be able to take this example, adapt and apply it to your
 specific use case. You can also translate this tutorial context for other
@@ -28,8 +42,8 @@ The concept of Jamstack is not new and its advantages have been extensively
 documented before. Jamstack architectures allow us to build more performant,
 more secure, and more scalable websites.
 
-The term "static" can be a bit misleading - that's why I like to use
-"pre-rendered" interchangeably. When we build a Jamstack app, it doesn't mean we
+The term "static" can be a bit misleading - that's why we see "pre-rendered"
+being used interchangeably. When we build a Jamstack app, it doesn't mean we
 have to compromise on dynamic features or dynamic data.
 
 https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/
@@ -62,13 +76,6 @@ of Vue.js. It is well known for its SSR capabilities, but it can also do static.
 
 We'll be using Nuxt to do the heavy lifting during the build stage. Instead of
 having to at each client request?
-
-The reason for static ... Do we really need to have a server make the same
-request, to get the same data, take those same results, run them against a
-templating engine and only then deliver the response to the client?
-
-It's not that often that we need to add or delete a repo from the catalogue.
-only some have a special place in your heart and that does not happen every day.
 
 ## FaunaDB
 
@@ -112,7 +119,7 @@ Before you begin, you'll need:
 - Node and npm installed
 - A [FaunaDB account](https://dashboard.fauna.com/accounts/register)
 
-Let's get started!
+Let's get started! diving head on
 
 ## Modelling our data
 
@@ -506,44 +513,98 @@ generate: {
         )
       )
       const repos = result.data.map((repo) => repo.data)
-      return repos.map((repo) => {
+      const routes = repos.map((repo) => {
         const repoUrlParts = repo.repoUrl.split('/')
+        const slug = slugify(repoUrlParts[repoUrlParts.length - 1], {
+          remove: /[*+~.()'"!:@]/g
+        })
+        repo.slug = slug
         return {
-          route:
-            '/repos/' +
-            slugify(repoUrlParts[repoUrlParts.length - 1], {
-              remove: /[*+~.()'"!:@]/g
-            }),
+          route: '/repos/' + slug,
           payload: repo
         }
       })
+      routes.push({
+        route: '/',
+        payload: repos
+      })
+      return routes
     }
-}
+  }
 ```
 
-It's quite some code. So, let’s break down the different steps of the snippet:
+It's quite some code. So, let’s review the different steps of the snippet:
 
 - Import the `faunadb` driver from `node_modules`
 - Import the `slugify` package from `node_modules`
 - Load the Fauna secret key from `.env`
 - Instantiate a Fauna client using the secret key
 - Fetch the entire repo collection using the `allRepos` Index
-- Go through each repo, generate a slug and return an object with a route path
-  and the repo data as its payload
-
+- Go through each repo, generate a slug and return an object with the route path
+  and the repo data as its payload pass along the entire user object to the
+  context in \_id.vue.
+- Add the route for the home
 - Return the array of routes that should be generated
 
-"In the example above, we're using the user.id from the server to generate the
-routes but tossing out the rest of the data. Typically, we need to fetch it
-again from inside the /users/\_id.vue. While we can do that, we'll probably need
-to set the generate.interval to something like 100 in order not to flood the
-server with calls. Because this will increase the run time of the generate
-script, it would be preferable to pass along the entire user object to the
-context in \_id.vue. We do that by modifying the code above to this:"
+## Creating the site pages
 
-## Creating our pages
+Start with `pages/index.vue` and replace the existing `<script>` with:
 
-Start with `pages/index.vue` and replace it with:
+```vue
+<script>
+export default {
+  asyncData({ params, error, payload, $axios }) {
+    return { repos: payload };
+  },
+};
+</script>
+```
+
+Now we can access the payload from /users/\_id.vue like so:
+
+Start with `pages/index.vue` and replace the existing `<template>` with:
+
+```vue
+<template>
+  <section class="section">
+    <div class="container">
+      <h1
+        :style="{ marginBottom: '5rem' }"
+        class="title has-text-centered is-size-1"
+      >
+        Repo Catalogue
+      </h1>
+      <div class="columns is-multiline">
+        <div
+          v-for="repo in repos"
+          :key="repo.projectName"
+          class="card column is-3"
+        >
+          <div
+            :style="{ backgroundColor: '#' + repo.colorHex }"
+            class="card-image"
+          >
+            <a :href="`/repos/${repo.slug}`">
+              <figure
+                :style="{ maxWidth: '20%' }"
+                v-html="repo.svgLogo"
+              ></figure>
+            </a>
+          </div>
+          <div class="card-content">
+            <div class="media">
+              <div class="media-content">
+                <h3 class="title">{{ repo.projectName }}</h3>
+                <a class="subtitle" :href="repo.repoUrl">GitHub</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+```
 
 Create the file `pages/repos/_slug.vue` and replace it with:
 
@@ -551,17 +612,10 @@ Now we can access the payload from /users/\_id.vue like so:
 
 ## Running Nuxt generate
 
-Introduction to the step. What are we going to do and why are we doing it?
+Now that we've created the page templates, we have everything we need to build
+our website, with dynamically generated routes, from Fauna data.
 
-"Since we want the bookmarks to be rendered in HTML and not fetched by the
-browser, we’ll need something to do the rendering."
-
-Pre-generate a route for each repo of the collection
-
-- Building our static website from Fauna data
-- Dynamically generating routes/pages
-
-build your Nuxt.js project:
+Build your Nuxt.js Repo Catalogue:
 
 ```shell
 npm run generate
@@ -576,8 +630,8 @@ Probably the main objection to static sites is "I don't want to have to rebuild
 the entire site every time something changes in the database".
 
 It's a totally valid argument - a nuanced one nonetheless. For example, a
-Netlify hosted website won't have any downtime, while the build/deploy of a new
-version takes place.
+[Netlify](https://www.netlify.com/) hosted website won't have any downtime,
+while the build/deploy of a new version takes place.
 
 So what is the **real** downside? Maybe the time it takes to rebuild a website
 with large amounts of content. And even in that domain, we're starting to see
@@ -587,15 +641,15 @@ builds](https://www.gatsbyjs.org/blog/2020-04-22-announcing-incremental-builds/)
 But still, there are certainly some scenarios where constantly rebuilding the
 site is not viable.
 
-Going back to our Repo Catalogue, suppose we want to add some dynamic data, such
-as stars and forks.
+Going back to our Repo Catalogue, suppose we want to add some dynamic data to
+the detail pages, such as stars and forks.
 
 Clearly, it's not practical to rebuild an entire website whenever this type of
 data changes.
 
-In this section, we'll be adding some dynamic data to our Repo detail pages.
-We'll be adding an asynchronous JavaScript API call to the GitHub API page that
-gets back its rating.
+In this section, we'll be adding some dynamic data to the Repo detail page.
+We'll be adding an asynchronous JavaScript API call to the GitHub API page the
+repo's information.
 
 The request for this data will be made client-side and we'll rely on Vue's
 reactivity to display, we have to add some code `/pages/repos/_slug.js`:
@@ -610,8 +664,8 @@ mounted() {
 }
 ```
 
-Now run generate again so that this client-side code is included in the app's
-bundle:
+Now, tell Nuxt to generate the site again, so that this client-side code is
+included in the app's bundle:
 
 ```shell
 npm run generate
@@ -619,15 +673,13 @@ npm run generate
 
 ## Conclusion
 
-In this article we've built a Repo Catalogue static website that you can deploy
-on your host of choice.
+In this article, we've built a Repo Catalogue static website that you can deploy
+on a host of your choice.
 
-"In this article, we implemented an approach that loads part of the data at build
-time, and then loads the rest of the data in the frontend as the user interacts
-with the page."
+"we implemented an approach that loads part of the data at build time, and then
+loads the rest of the data in the frontend as the user interacts with the page."
 
-"Interested in getting the code? You can grab it on Github! Take a look at the
-finished product here."
+"Interested in getting the code? You can grab it on Github!
 
 "The code for this tutorial can be found here." `fauna-seeder` `repo-catalogue`
 
@@ -638,9 +690,10 @@ asynchronously fetch just the data we need.
 
 ### What to do next
 
-### Acknowledgements
+- Host on Netlify
+- [Webhooks on content change] - trigger build
 
-[Webhooks on content change]
+### Acknowledgements
 
 https://css-tricks.com/static-first-pre-generated-jamstack-sites-with-serverless-rendering-as-a-fallback/
 https://css-tricks.com/static-or-not/
