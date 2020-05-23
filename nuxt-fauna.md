@@ -6,7 +6,7 @@ a static site, from FaunaDB data.
 Pre-rendering at build time is not all we will be doing. We' ll also display
 additional, more dynamic repo info, using Vue.js for client-side hydration.
 
-Check out the finished work [here](https://elegant-hopper-28219e.netlify.app/).
+Check out the finished demo [here](https://elegant-hopper-28219e.netlify.app/).
 
 ## Why a Repository Catalogue?
 
@@ -19,7 +19,8 @@ can customize to display repo information that is more relevant to you.
 Although we'll be building a very concrete implementation, its main purpose is
 to serve as an example to the core underlying idea of this article. The benefits
 of pre-rendering as much as we can of a website, and through client-side
-JavaScript. sprinkle it with just the more dynamic type of data.
+JavaScript. sprinkle it with just the more dynamic type of data. [static
+first](https://css-tricks.com/static-first-pre-generated-jamstack-sites-with-serverless-rendering-as-a-fallback/)
 
 > "It’s usually a good idea to load as much data at build time as possible to
 > improve page performance. But if the data isn’t needed by all clients, or too
@@ -31,17 +32,19 @@ JavaScript. sprinkle it with just the more dynamic type of data.
 When analyzing the requirements for a Repo Catalogue, we can straight away
 identify two categories of data:
 
-- some that does not change often or not at all (e.g., project name, SVG logo,
-  repo URL)
+- some that does not change often or not at all (e.g., project name, logo, repo
+  URL)
 - some that changes frequently (e.g., number of stars and forks)
 
 This observation may then lead us to the question:
 
 - "Do we really need to keep making the same request, to get the same data, take
-  those same results, run them against the same templating engine, and only
-  then, deliver the page to the client?".
+  those same results, run them against the same template, and only then, deliver
+  the page to the client?".
 
-What if we? mindsets and creative strategies. with data Jamstack approach
+What if we implement a Jamstack strategy and strive to use the server side build
+to to fetch the category of data that does not change often from an API or
+database and serve HTML and static assets to our site's visitors?
 
 After all, it's not _that_ often we need to add or delete a repo from the
 catalogue. only some projects a special place in your heart, and that does not
@@ -54,31 +57,30 @@ real-time apps very easily, explain as go along in the article.
 ## Jamstack
 
 The concept of Jamstack is not new and its advantages have been extensively
-documented before. Jamstack architectures allow us to build more performant,
-more secure, and more scalable websites.
+documented before. Jamstack architectures allow us to build fast, more secure,
+and more scalable websites.
 
 With HTML being pre-rendered once and then statically served from a CDN, the
-performance for users is much better.
-"Much less API calls are made, requiring much less computing time and power"
-
-It allows to fetch data only when building the site, which should be less often
-than visitors viewing pages.
+performance for users has the potential to be much better. Fetching data at the
+build stage - instead of each time a client requests a page, with minimum
+computing overhead.
 
 The term "static" can be a bit misleading - that's why we see "pre-rendered"
 being used interchangeably. When we build a Jamstack app, it doesn't mean we
 have to compromise on dynamic features or dynamic data.
 
+"Using the server side build to get the provides multiple benefits" "Enhance
+client side, if really needed.
+
 The widespread of functionality APIs, makes way for common tasks - such as
 authentication, e-commerce, and data storage - that used to be implemented over
-and over, now be delegated to the experts of those specific domains.
-
-https://nicolas-hoizey.com/articles/2020/05/05/jamstack-is-fast-only-if-you-make-it-so/
-Using the server side build to get the provides multiple benefits:
+and over, now be delegated to the experts/service providers of those specific
+domains.
 
 ## FaunaDB
 
-FaunaDB is a globally distributed, low-latency database that promises to be
-always consistent and always secure.
+FaunaDB is a native GraphQL globally distributed, low-latency database that
+promises to be always consistent and always secure.
 
 As a serverless database, FaunaDB allows our applications to access data "as a
 service". Contrary to more "traditional" relational databases, there's no need
@@ -93,9 +95,9 @@ productive and focus on the business logic of the app we're building.
 Nuxt.js is an open-source web application framework built on top of Vue.js. It
 is well known for its SSR capabilities, but it can also do static.
 
-Instead of having a Node serve to process each client request - fetching data
-from an API or database in between, we'll be using Nuxt as a static site
-generator to do the heavy lifting during the build stage.
+Instead of having a Node server process each client request - eventually
+fetching data from an API or database in between, we'll be using Nuxt as a
+static site generator to do the heavy lifting during the build stage.
 
 ## Goals
 
@@ -135,20 +137,19 @@ a collection of repos in the Fauna database.
 
 Each repo is represented by the following properties:
 
-- name
+- project name
 - GitHub repo URL
-- SVG logo
-- main color hex code
+- project SVG logo
+- project main color hex code
 
 ## Writing the GraphQL schema
-
-Resource on writing schema
 
 In this section, we'll be creating the helper app `fauna-seeder` that will
 populate the database.
 
-It will also contain the GraphQL schema that represents and will be used to
-create the database and what resources the database will provide.
+Inside this project, we'll also store the GraphQL schema we'll be writing to
+define our repo data, The schema will be used in the next step to create the
+database and specify what resources the database will provide.
 
 > "GraphQL is a specification for an API query language and a server engine
 > capable of executing such queries."[Production Ready GraphQL](https://book.productionreadygraphql.com/)
@@ -182,26 +183,25 @@ npm init -y
 This creates a `package.json` file where we can install the required
 dependencies:
 
-We've installed three dependencies:
-
-- faunadb: JavaScript driver for FaunaDB
-- simple-icons: [SimpleIcons](https://simpleicons.org/) npm package
-- dotenv: to store and load Fauna's secret key from a `.env` file
-
 ```shell
 npm install dotenv faunadb simple-icons
 ```
 
-https://www.youtube.com/watch?v=KlUPiQaTp0I
-FaunaDB has native GraphQL support that allows us to import a GraphQL schema and
-get an "instant" GraphQL endpoint.
+We've installed three dependencies:
 
-"GraphQL also uses a typed schema."
+- faunadb: JavaScript driver for FaunaDB
+- simple-icons: [Simple Icons](https://simpleicons.org/) npm package
+- dotenv: to store and load Fauna's secret key from a `.env` file
 
 FQL the native API for querying the data FQL functional, composable
 
-Let's begin by writing our GraphQL schema. Create a new file `schemal.graphql`
-and add the following:
+Simple Icons is a cool project that collects SVG icons and colors for popular
+brands. We'll be using their [npm
+package](https://github.com/simple-icons/simple-icons) to dynamically fetch the
+SVG logo and the hex color code of each project, when the seeder app runs.
+
+Let's now write the GraphQL schema. Create a new file `schemal.graphql`
+and add the following content:
 
 ```shell
 touch schema.gql
@@ -220,22 +220,25 @@ type Query {
 }
 ```
 
-We've declared the entity `Repo` to represent an individual repository in the
-collection.
+As you may know, GraphQL uses a typed schema to specify entities and their
+fields. We've declared the entity `Repo` to represent an individual repository
+in the collection.
 
-A repo has project name, a repository URL, and a SVG logo. `@unique` defines
+A repo has a project name, a repository URL, a SVG logo, and a color. `!` if the
+field is not-nullable and `@unique` if value of the field must be unique.
 that?attributes? doesn't allow to store repos with the same same or the same
 repo url
 
-We've also declared a query `allRepos`, to list off all repos that are stored in
-the database.
+The schema also defines the query that we want to make available for clients to
+run. In this case, We've also declared a query `allRepos`, to list all the repos
+that are stored in the database.
 
 ## Creating a Fauna database
 
 Log in to your Fauna account.
 
-Visit the [dashboard](https://dashboard.fauna.com/) and create a new database
-and name it `repos`.
+Visit the [dashboard](https://dashboard.fauna.com/) and create a new database,
+naming it `repos`:
 
 **PRINTSCREEN**
 
@@ -243,15 +246,21 @@ and name it `repos`.
 
 Now that the database is created, we can import the GraphQL schema into FaunaDB.
 
-Import schema in Fauna "You can upload your schema.gql file via the FaunaDB
-Console by clicking“GraphQL” on the left sidebar, and then click the “Import
-Schema” button."
+FaunaDB has a feature that allows us to import a GraphQL schema, that besides
+creating the database, also provides an "instant" GraphQL endpoint.
+
+We can upload our `schema.gql` file, via FaunaDB Console by clicking "GraphQL"
+on the left sidebar:
 
 **PRINTSCREEN**
 
-Inside a Fauna database, we have Collections, Indexes and Documents.
+Then click the "Import Schema" button." Click "GraphQL" in the left sidebar,
+which opens your browser’s file upload. Select the `schema.gql` file:
 
-"FaunaDB automatically created the necessary collection for the `Repo` entity.
+**PRINTSCREEN**
+
+Inside a Fauna database, we have Collections, Indexes and Documents. "FaunaDB
+automatically created the necessary collection for the `Repo` entity.
 Additionally, It also creates the indexes that to support the schema."
 
 "Besides that, it also creates the indexes that are needed to interact with
@@ -280,6 +289,8 @@ keys for the database Create a new key -> select the database you've just
 created, select the Role Admin you can name the key whatever you want and save
 Go to the Fauna dashboard and from the Security menu create a new key with the
 admin role, and name it `FAUNA_ADMIN`:
+copy the secret key and save it as after you navigate away from this page it is
+not going to be displayed again
 
 **PRINTSCREEN**
 
@@ -289,8 +300,6 @@ Create a `.env` file in the root directory of the `fauna-seeder` app:
 touch .env
 ```
 
-copy the secret key and save it as after you navigate away from this page it is
-not going to be displayed again
 Paste the generated key right after the variable's name:
 
 ```
@@ -349,13 +358,6 @@ Each repo is represented by three properties:
 - project **name**
 - GitHub **repo URL**
 - Simple Icons **brand title**
-
-[Simple Icons](https://simpleicons.org/) is a cool project that collects SVG
-icons and colors for popular brands.
-
-We'll be using their [npm package](https://github.com/simple-icons/simple-icons)
-to dynamically fetch the SVG logo and the hex color code of each project, when
-the seeder app runs.
 
 Create a `data.json` file:
 
@@ -678,30 +680,34 @@ included in the app's bundle:
 npm run generate
 ```
 
+And we’re done!
+
 ## Conclusion
 
 In this article, we've built a Repo Catalogue static website that you can deploy
 on a host of your choice.
 
 "we implemented an approach that loads part of the data at build time, and then
-loads the rest of the data in the frontend as the user interacts with the page."
+loads the rest of the data in the frontend as the user visits the page that
+displays that data"
 
 "The code for this tutorial can be found here the GitHub repos." `fauna-seeder`
 `repo-catalogue`
 
-We've also learned/seen covered One of the key ideas I want to present in this
-article is that it doesn't always have to be a matter of A/B decision. We should
-aim for a "hybrid" solution whenever possible, where we pre-render the most we
-can, and asynchronously fetch just the data we need.
+We've also seen covered One of the key ideas I want to present in this article
+is that it doesn't always have to be a matter of A/B decision. We should aim for
+a "hybrid" solution whenever possible, where we pre-render the most we can, and
+asynchronously fetch just the data we need.
 
 ### What to do next
+
+Here are a couple of further steps
 
 - Host on Netlify
 - [Webhooks on content change] - trigger build
 
 ### Acknowledgements
 
-https://css-tricks.com/static-first-pre-generated-jamstack-sites-with-serverless-rendering-as-a-fallback/
 https://css-tricks.com/static-or-not/
 https://css-tricks.com/get-static/
 
@@ -713,13 +719,7 @@ https://fauna.com/blog/building-a-serverless-jamstack-app-with-faunadb-cloud-par
 https://github.com/netlify/netlify-faunadb-example
 https://www.netlify.com/blog/2018/07/09/building-serverless-crud-apps-with-netlify-functions-faunadb/
 
-https://nuxtjs.org/blog/build-dev-to-clone-with-nuxt-new-fetch
-
 https://devops.com/defining-the-database-requirements-of-dynamic-jamstack-applications/?utm_source=hootsuite&utm_medium=twitter
-
-https://css-tricks.com/static-or-not/
-
-https://github.com/public-apis/public-apis
 
 https://www.youtube.com/watch?v=Qkc8p4D6JM0
 
