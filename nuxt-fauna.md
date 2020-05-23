@@ -42,7 +42,7 @@ the time it reaches the user.
 
 The widespread of functionality APIs makes way for common tasks - such as
 authentication, e-commerce, and data storage - that used to be implemented over
-and over again, now be delegated to the experts of those specific domains.
+and over, now be delegated to the experts of those specific domains.
 
 distinguishing static data and real-time data
 
@@ -438,7 +438,7 @@ npm install faunadb slugify
 
 ### Fauna key
 
-The same way we did for the `fauna-seeder` app, let's create a Fauna key - this
+The same way we did for the `fauna-seeder` app, let's create a new Fauna key - this
 time with "Server" role, fetch data from the collection.
 
 **PRINTSCREEN**
@@ -455,13 +455,36 @@ In the top of `nuxt.config.js` require and configure dotenv:
 require("dotenv").config();
 ```
 
-## Routes and Nuxt generate
+## Routes
 
-Talk a bit about `nuxt generate`.
+The Repo Catalogue website will respond in two types of routes:
 
-Add after build, property the generate:
-routes function
-Add edit the following to your `nuxt.config.js`:
+- one home page, where all repos are listed
+- several repo detail pages, one for each repo in the catalogue
+
+The `pages` folder will look like this in Nuxt:
+
+```shell
+├── index.vue
+├── repos
+│   └── _slug.vue
+```
+
+Since we want to pre-render the site's pages, we need to tell Nuxt which routes
+to [generate](https://nuxtjs.org/api/configuration-generate).
+
+The routes for the individual repo pages have to be generated
+[dynamically](https://nuxtjs.org/guide/routing#dynamic-routes).
+
+In Nuxt, we do this by setting the generate.routes property to an array of
+dynamic routes.
+
+When running `nuxt generate`, Nuxt.js will use the configuration defined in the
+`generate` property, to pre-render the site.
+
+- Define an async function called main to send queries to the database
+
+Let's add the `generate` property in `nuxt.config.js`:
 
 ```javascript
 generate: {
@@ -500,30 +523,31 @@ generate: {
 
 It's quite some code. So, let’s break down the different steps of the snippet:
 
-- Import the PrismaClient constructor from the @prisma/client node module
-- Instantiate PrismaClient
-- Define an async function called main to send queries to the database
-- Call the main function
-- Return the database connections when the script terminates
+- Import the `faunadb` driver from `node_modules`
+- Import the `slugify` package from `node_modules`
+- Load the Fauna secret key from `.env`
+- Instantiate a Fauna client using the secret key
+- Fetch the entire repo collection using the `allRepos` Index
+- Go through each repo, generate a slug and return an object with a route path
+  and the repo data as its payload
+
+- Return the array of routes that should be generated
+
+"In the example above, we're using the user.id from the server to generate the
+routes but tossing out the rest of the data. Typically, we need to fetch it
+again from inside the /users/\_id.vue. While we can do that, we'll probably need
+to set the generate.interval to something like 100 in order not to flood the
+server with calls. Because this will increase the run time of the generate
+script, it would be preferable to pass along the entire user object to the
+context in \_id.vue. We do that by modifying the code above to this:"
 
 ## Creating our pages
-
-The Site will have two pages:
-
-- index.vue: where all repos will be listed
-- \_slug.vue: repo details page
-
-structure for our app. Our pages folder should look like this:
-
-```shell
-├── index.vue
-├── repos
-│   └── _slug.vue
-```
 
 Start with `pages/index.vue` and replace it with:
 
 Create the file `pages/repos/_slug.vue` and replace it with:
+
+Now we can access the payload from /users/\_id.vue like so:
 
 ## Running Nuxt generate
 
