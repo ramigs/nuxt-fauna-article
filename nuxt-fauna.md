@@ -3,7 +3,7 @@
 In this article, we will build a Repository Catalogue, using Nuxt.js to generate
 a static site, from FaunaDB data.
 
-Pre-rendering at build time is not all we will be doing. We will also display
+Pre-rendering at build time is not all we will be doing. We' ll also display
 additional, more dynamic repo info, using Vue.js for client-side hydration.
 
 Check out the finished work [here](https://elegant-hopper-28219e.netlify.app/).
@@ -16,9 +16,10 @@ like to keep track of.
 The Repository Catalogue will serve as a collection of GitHub projects, that you
 can customize to display repo information that is more relevant to you.
 
-Although we'll be building a very concrete implementation, the main purpose is
-to serve as an example to the main underlying to the core idea for this article.
-The benefits of pre-rendering a site with data Jamstack approach
+Although we'll be building a very concrete implementation, its main purpose is
+to serve as an example to the core underlying idea of this article. The benefits
+of pre-rendering as much as we can of a website, and through client-side
+JavaScript. sprinkle it with just the more dynamic type of data.
 
 > "It’s usually a good idea to load as much data at build time as possible to
 > improve page performance. But if the data isn’t needed by all clients, or too
@@ -27,16 +28,18 @@ The benefits of pre-rendering a site with data Jamstack approach
 > pagination, or any data that changes rather frequently and might be outdated by
 > the time it reaches the user. _[Build a dynamic JAMstack app with GatsbyJS and FaunaDB](https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/)_
 
-When we analyze the requirements for a Repo Catalogue, right away we can
-identify two categories of data, some that change frequently (e.g., number of
-stars and forks) and some that does not change often or at all (e.g., project
-name, SVG logo, repo URL).
+When analyzing the requirements for a Repo Catalogue, right away we can identify
+two categories of data: some that changes frequently (e.g., number of stars and
+forks); and some that does not change often or not at all (e.g., project name,
+SVG logo, repo URL).
 
-This observation, may then lead us to the question: "Do we really need to keep
-makimg the same request, to get the same data, take those same results, run them
-against a templating engine, and only then, deliver the response to the client?
+This observation may then lead us to the question:
 
-What if we? mindsets and creative strategies.
+- "Do we really need to keep making the same request, to get the same data, take
+  those same results, run them against the same templating engine, and only
+  then, deliver the page to the client?".
+
+What if we? mindsets and creative strategies. with data Jamstack approach
 
 After all, it's not _that_ often we need to add or delete a repo from the
 catalogue. only some projects a special place in your heart, and that does not
@@ -56,27 +59,26 @@ The term "static" can be a bit misleading - that's why we see "pre-rendered"
 being used interchangeably. When we build a Jamstack app, it doesn't mean we
 have to compromise on dynamic features or dynamic data.
 
-The widespread of functionality APIs makes way for common tasks - such as
+The widespread of functionality APIs, makes way for common tasks - such as
 authentication, e-commerce, and data storage - that used to be implemented over
 and over, now be delegated to the experts of those specific domains.
 
-distinguishing static data and real-time data
+https://nicolas-hoizey.com/articles/2020/05/05/jamstack-is-fast-only-if-you-make-it-so/
+Using the server side build to get the provides multiple benefits:
+
+- The performance for the users is much better, with HTML already computed on the server and statically served
+- Much less API calls are made, requiring much less computing time and power
+  distinguishing static data and real-time data
 
 It allows to call webmentio.io API only when building the site, which should be
 less often than visitors viewing pages
 
 directly from a CDN
 
-https://nicolas-hoizey.com/articles/2020/05/05/jamstack-is-fast-only-if-you-make-it-so/
-Using the server side build to get the webmentions provides multiple benefits:
-
-- The performance for the users is much better, with HTML already computed on the server and statically served
-- Much less API calls are made, requiring much less computing time and power
-
 ## Nuxt.js
 
-Nuxt.js is an MIT-licensed, open-source web application framework built on top
-of Vue.js. It is well known for its SSR capabilities, but it can also do static.
+Nuxt.js is an open-source web application framework built on top of Vue.js. It
+is well known for its SSR capabilities, but it can also do static.
 
 We'll be using Nuxt to do the heavy lifting during the build stage. Instead of
 having to at each client request?
