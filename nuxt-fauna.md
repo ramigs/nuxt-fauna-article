@@ -6,7 +6,7 @@ a static site, from FaunaDB data.
 Pre-rendering at build time is not all we will be doing. We will also display
 additional, more dynamic repo info, using Vue.js for client-side hydration.
 
-Check out the finished product [here](https://elegant-hopper-28219e.netlify.app/).
+Check out the finished work [here](https://elegant-hopper-28219e.netlify.app/).
 
 ## Why a Repository Catalogue?
 
@@ -16,25 +16,35 @@ like to keep track of.
 The Repository Catalogue will serve as a collection of GitHub projects, that you
 can customize to display repo information that is more relevant to you.
 
-Although we'll be using a very concrete example implementation, the main
-underlying idea presented is the benefit of pre-rendering static site being able
-to fetch data from a database and use it to build a static/pre-rendered site
-that can be served directly from a CDN.
+Although we'll be building a very concrete implementation, the main purpose is
+to serve as an example to the main underlying to the core idea for this article.
+The benefits of pre-rendering a site with data Jamstack approach
+
+> "It’s usually a good idea to load as much data at build time as possible to
+> improve page performance. But if the data isn’t needed by all clients, or too
+> big to be sent to the client all at once, we can split things up and switch to
+> on-demand loading on the client. This is the case for user-specific data,
+> pagination, or any data that changes rather frequently and might be outdated by
+> the time it reaches the user. _[Build a dynamic JAMstack app with GatsbyJS and FaunaDB](https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/)_
+
+When we analyze the requirements for a Repo Catalogue, right away we can
+identify two categories of data, some that change frequently (e.g., number of
+stars and forks) and some that does not change often or at all (e.g., project
+name, SVG logo, repo URL).
+
+This observation, may then lead us to the question: "Do we really need to keep
+makimg the same request, to get the same data, take those same results, run them
+against a templating engine, and only then, deliver the response to the client?
+
+What if we? mindsets and creative strategies.
 
 After all, it's not _that_ often we need to add or delete a repo from the
-catalogue. only some have a special place in your heart and that does not happen
-every day.
-
-so right away we see two categories of data, some that changes frequently and
-some that does not. What if we?
-
-Making us question: "Do we really need to keep makimg the same request, to get
-the same data, take those same results, run them against a templating engine and
-only then deliver the response to the client?
+catalogue. only some projects a special place in your heart, and that does not
+happen every day :).
 
 At the end, you'll be able to take this example, adapt and apply it to your
 specific use case. You can also translate this tutorial context for other
-real-time apps very easily, which we'll discuss later.
+real-time apps very easily, explain as go along in the article.
 
 ## Jamstack
 
@@ -46,14 +56,6 @@ The term "static" can be a bit misleading - that's why we see "pre-rendered"
 being used interchangeably. When we build a Jamstack app, it doesn't mean we
 have to compromise on dynamic features or dynamic data.
 
-https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/
-"It’s usually a good idea to load as much data at build time as possible to
-improve page performance. But if the data isn’t needed by all clients, or too
-big to be sent to the client all at once, we can split things up and switch to
-on-demand loading on the client. This is the case for user-specific data,
-pagination, or any data that changes rather frequently and might be outdated by
-the time it reaches the user.
-
 The widespread of functionality APIs makes way for common tasks - such as
 authentication, e-commerce, and data storage - that used to be implemented over
 and over, now be delegated to the experts of those specific domains.
@@ -62,6 +64,8 @@ distinguishing static data and real-time data
 
 It allows to call webmentio.io API only when building the site, which should be
 less often than visitors viewing pages
+
+directly from a CDN
 
 https://nicolas-hoizey.com/articles/2020/05/05/jamstack-is-fast-only-if-you-make-it-so/
 Using the server side build to get the webmentions provides multiple benefits:
@@ -431,7 +435,7 @@ npx create-nuxt-app repo-catalogue
 Go through the steps and select the following options:
 
 - axios and dotenv in the modules step
-- Bulma in the UI framework step
+- Bulma in the UI framework step, to style our app
 
 Once the tool finishes creating our Nuxt app, install also the other required
 dependencies:
@@ -626,7 +630,7 @@ be served directly from a CDN!
 
 ## Adding dynamic content to our Repo Catalogue
 
-Probably the main objection to static sites is "I don't want to have to rebuild
+Perhaps the main objection to static sites is "I don't want to have to rebuild
 the entire site every time something changes in the database".
 
 It's a totally valid argument - a nuanced one nonetheless. For example, a
