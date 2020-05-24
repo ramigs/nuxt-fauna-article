@@ -6,7 +6,7 @@ a static site, from FaunaDB data.
 Pre-rendering at build time is not all we will be doing. We' ll also display
 additional, more dynamic repo info, using Vue.js for client-side hydration.
 
-Check out the finished working demo [here](https://elegant-hopper-28219e.netlify.app/).
+Check out the working demo [here](https://elegant-hopper-28219e.netlify.app/).
 
 ## Why a Repository Catalogue?
 
@@ -74,8 +74,7 @@ client side, if really needed.
 
 The widespread of functionality APIs, makes way for common tasks - such as
 authentication, e-commerce, and data storage - that used to be implemented over
-and over, now be delegated to the professional providers of those specific
-services.
+and over, now be delegated to the professional service providers.
 
 ## FaunaDB
 
@@ -119,9 +118,6 @@ knowledge of the following technologies is beneficial:
 - JavaScript
 - Vue.js/Nuxt.js
 - GraphQL
-
-This will be a complete step-by-step tutorial, where the reader follows along
-and ends up with the exact same site.
 
 Before you begin, you'll need:
 
