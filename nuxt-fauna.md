@@ -48,7 +48,7 @@ database and serve HTML and static assets to our site's visitors?
 
 After all, it's not _that_ often we need to add or delete a repo from the
 catalogue. only some projects a special place in your heart, and that does not
-happen every day :).
+happen every day 😄.
 
 At the end, you'll be able to take this example, adapt and apply it to your
 specific use case. You can also translate this tutorial context for other
@@ -56,13 +56,14 @@ real-time apps very easily, explain as go along in the article.
 
 ## Jamstack
 
-The concept of Jamstack is not new and its advantages have been extensively
-documented before. Jamstack architectures allow us to build fast, more secure,
-and more scalable websites.
+The concepts of Jamstack and "static-first" are not new and their advantages
+have been [extensively](https://css-tricks.com/static-or-not/) documented
+before. Jamstack architectures allow us to build fast, more secure, and more
+scalable websites.
 
 With HTML being pre-rendered once and then statically served from a CDN, the
-performance for users has the potential to be much better. Fetching data at the
-build stage - instead of each time a client requests a page, with minimum
+performance of a website has the potential to be much better. Fetching data at
+the build stage - instead of each time a client requests a page, with minimum
 computing overhead.
 
 The term "static" can be a bit misleading - that's why we see "pre-rendered"
@@ -135,7 +136,7 @@ Let's get started! diving head on
 First things first, we begin by specifying the data model. The goal is to store
 a collection of repos in the Fauna database.
 
-Each repo is represented by the following properties:
+Each repo is represented by the following fields:
 
 - project name
 - GitHub repo URL
@@ -221,24 +222,23 @@ type Query {
 ```
 
 As you may know, GraphQL uses a typed schema to specify entities and their
-fields. We've declared the entity `Repo` to represent an individual repository
-in the collection.
+fields. We've declared the object type `Repo` to represent an individual
+repository in the collection.
 
-A repo has a project name, a repository URL, a SVG logo, and a color. `!` if the
-field is not-nullable and `@unique` if value of the field must be unique.
-that?attributes? doesn't allow to store repos with the same same or the same
-repo url
+A repo has a project name, a repository URL, a SVG logo, and a color. The first
+two fields are declared as non-nullable `!` and unique `@unique`. This
+guarantees that a repo always has values for these required fields, and that
+there are no repeated repos in the collection.
 
-The schema also defines the query that we want to make available for clients to
-run. In this case, We've also declared a query `allRepos`, to list all the repos
-that are stored in the database.
+We've also declared a query `allRepos`, to list all the repos that are stored in
+the collection.
 
 ## Creating a Fauna database
 
 Log in to your Fauna account.
 
 Visit the [dashboard](https://dashboard.fauna.com/) and create a new database,
-naming it `repos`:
+named `repos`:
 
 **PRINTSCREEN**
 
@@ -272,11 +272,12 @@ data.
 ## Seeding data to Fauna
 
 FaunaDB is a non-relational database that stores data in the JSON format. There
-are two ways of interacting with Fauna data:
+are three ways of interacting with Fauna data:
 
 - Fauna drivers (available in several programming languages)
 - Interactive shell using The Fauna Query Language (FQL)
 - GraphQL Playground
+- GraphQL API using a GraphQL client (e.g., Apollo)
 
 We'll use the JavaScript [driver](https://github.com/fauna/faunadb-js), that
 we've already installed in a previous step.
@@ -447,9 +448,10 @@ dependencies:
 
 - faunadb: JavaScript driver for FaunaDB
 - slugify: to generate slugs from repo names
+- serve: to serve and test the website locally
 
 ```
-npm install faunadb slugify
+npm install faunadb slugify serve
 ```
 
 ### Fauna key
@@ -555,7 +557,7 @@ It's quite some code. So, let’s review the different steps of the snippet:
 - Add the route for the home
 - Return the array of routes that should be generated
 
-## Creating the site pages
+## Creating the pages
 
 Start with `pages/index.vue` and replace the existing `<script>` with:
 
@@ -569,9 +571,10 @@ export default {
 </script>
 ```
 
-Now we can access the payload from /users/\_id.vue like so:
+We've used Nuxt's `asyncData` to instantiate the variable `repos` with the
+payload passed in the `generate` configuration.
 
-Start with `pages/index.vue` and replace the existing `<template>` with:
+Now that have access to the data, replace the existing `<template>` with:
 
 ```vue
 <template>
@@ -615,9 +618,43 @@ Start with `pages/index.vue` and replace the existing `<template>` with:
 </template>
 ```
 
-Create the file `pages/repos/_slug.vue` and replace it with:
+Let's move on with the individual repo detail page. Create the file
+`pages/repos/_slug.vue` and replace the existing `<script>` with:
 
-Now we can access the payload from /users/\_id.vue like so:
+```vue
+<script>
+export default {
+  asyncData({ params, error, payload, $axios }) {
+    if (payload) return { repo: payload };
+  },
+};
+</script>
+```
+
+Now that have access to the data, replace the existing `<template>` with:
+
+```vue
+<template>
+  <div>
+    <section
+      :style="{ backgroundColor: '#' + repo.colorHex }"
+      class="hero has-text-centered"
+    >
+      <div class="hero-body">
+        <div class="container">
+          <figure
+            :style="{ maxWidth: '10%', margin: '0 auto' }"
+            v-html="repo.svgLogo"
+          ></figure>
+          <h1 class="title has-text-light is-size-1">
+            {{ repo.projectName }}
+          </h1>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+```
 
 ## Running Nuxt generate
 
@@ -699,6 +736,8 @@ is that it doesn't always have to be a matter of A/B decision. We should aim for
 a "hybrid" solution whenever possible, where we pre-render the most we can, and
 asynchronously fetch just the data we need.
 
+use the best of both worlds
+
 ### What to do next
 
 Here are a couple of further steps
@@ -708,7 +747,6 @@ Here are a couple of further steps
 
 ### Acknowledgements
 
-https://css-tricks.com/static-or-not/
 https://css-tricks.com/get-static/
 
 https://jamstack.training/p/pre-generate-static-pages-with-dynamic-content
