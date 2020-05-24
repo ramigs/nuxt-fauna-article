@@ -58,7 +58,7 @@ real-time apps very easily, explain as go along in the article.
 The concepts of Jamstack and "static-first" are not new and their advantages
 have been [extensively](https://css-tricks.com/static-or-not/)
 [documented](https://css-tricks.com/get-static/) before. Jamstack architectures
-allow us to build faster, more secure, and more scalable websites.
+allow us to build faster, more secure, more scalable websites.
 
 With HTML being pre-rendered once and then statically served from a CDN, the
 performance of a website has the potential to be great. Fetching data at the
@@ -67,28 +67,28 @@ computing overhead.
 
 The term "static" can be a bit misleading - that's why we see "pre-rendered"
 being used interchangeably. When we build a Jamstack app, it doesn't mean we
-have to compromise on dynamic features or dynamic data.
+have to compromise on dynamic features or dynamic content.
 
 "Using the server side build to get the provides multiple benefits" "Enhance
 client side, if really needed.
 
 The widespread of functionality APIs, makes way for common tasks - such as
 authentication, e-commerce, and data storage - that used to be implemented over
-and over, now be delegated to the experts/service providers of those specific
-domains.
+and over, now be delegated to the professional providers of those specific
+services.
 
 ## FaunaDB
 
-FaunaDB is a native GraphQL globally distributed, low-latency database that
-promises to be always consistent and always secure.
+FaunaDB is globally distributed, low-latency database, with native GraphQL
+support, that promises to be always consistent and always secure.
 
 As a serverless database, FaunaDB allows our applications to access data "as a
 service". Contrary to more "traditional" relational databases, there's no need
-to host and manage our own database. Zero server operations and automatic
+to host and manage our own database. Zero server operations and transparent
 scalability out-of-the-box.
 
 From a developer's perspective this is awesome, because it allows us to be more
-productive and focus on the business logic of the app we're building.
+productive and focus on the logic of the app we're building.
 
 ## Nuxt.js
 
@@ -128,7 +128,7 @@ Before you begin, you'll need:
 - Node and npm installed
 - A [FaunaDB account](https://dashboard.fauna.com/accounts/register)
 
-Let's get started! diving head on
+Let's dive in!
 
 ## Modelling our data
 
@@ -216,7 +216,7 @@ type Repo {
 }
 
 type Query {
-  allRepos: [Repo!]
+  allRepos: [Repo!]!
 }
 ```
 
@@ -280,15 +280,14 @@ are three ways of interacting with Fauna data:
 We'll use the JavaScript [driver](https://github.com/fauna/faunadb-js), that
 we've already installed in a previous step.
 
-The driver requires a Fauna Admin Key in order to guarantee that it has the
-correct permissions to access and write data in the `repos` database.
+The driver requires a Fauna Admin Key in order to access and write data in the
+`repos` database.
 
-From the Fauna dashboard. go to Security on the left-hand sidebar to manage the
-keys for the database Create a new key -> select the database you've just
-created, select the Role Admin you can name the key whatever you want and save
-Go to the Fauna dashboard and from the Security menu create a new key with the
-admin role, and name it `FAUNA_ADMIN`: copy the secret key and save it as after
-you navigate away from this page it is not going to be displayed again
+From the database's dashboard, go to "Security" on the left-hand, and create a
+new key with "Admin" Role.
+
+Copy the generated key and save it somewhere safe, as after you navigate away
+from this page it will not be displayed again:
 
 **PRINTSCREEN**
 
@@ -298,14 +297,15 @@ Create a `.env` file in the root directory of the `fauna-seeder` app:
 touch .env
 ```
 
-Paste the generated key right after the variable's name:
+Add the environment variable `FAUNA_ADMIN_KEY` and paste the generated key right
+after the variable's name:
 
 ```
-FAUNA_ADMIN=
+FAUNA_ADMIN_KEY=
 ```
 
-"From here, we just need to access `process.env.FAUNA_SERVER_KEY` in order to access the right local
-environment variables.
+From here, we just need to reference `process.env.FAUNA_ADMIN_KEY` to access the
+key from within our code.
 
 Let's create a function that handles a client connection to Fauna:
 
@@ -445,16 +445,15 @@ dependencies:
 
 - faunadb: JavaScript driver for FaunaDB
 - slugify: to generate slugs from repo names
-- serve: to serve and test the website locally
 
-```
-npm install faunadb slugify serve
+```shell
+npm install faunadb slugify
 ```
 
 ### Fauna key
 
-The same way we did for the `fauna-seeder` app, let's create a new Fauna key - this
-time with "Server" role, fetch data from the collection.
+The same way we did for the `fauna-seeder` app, let's create a new Fauna key -
+this time with a "Server" role:
 
 **PRINTSCREEN**
 
@@ -555,7 +554,12 @@ It's quite some code. So, let’s review the different steps of the snippet:
 
 ## Creating the pages
 
-Start with `/pages/index.vue` and replace the existing `<script>` with:
+Let's being with the homepage `/pages/index.vue`.
+This is the page that lists the repo collection.
+
+Delete the default CSS inside `<style>` so we can start with a blank slate.
+
+Replace the content of `<script>` with:
 
 ```vue
 <script>
@@ -568,7 +572,7 @@ export default {
 ```
 
 We've used Nuxt's `asyncData` to instantiate the variable `repos` with the
-payload passed in the `generate` configuration.
+payload from the `generate` configuration.
 
 Now that have access to the data, replace the existing `<template>` with:
 
@@ -614,7 +618,10 @@ Now that have access to the data, replace the existing `<template>` with:
 </template>
 ```
 
-Let's move on with the individual repo detail page. Create the file
+In the template above, we go through each repo and display it as a Bulma
+Card.
+
+Let's move on to the individual repo detail page. Create a new file
 `/pages/repos/_slug.vue` and replace the existing `<script>` with:
 
 ```vue
@@ -652,10 +659,12 @@ Now that have access to the data, replace the existing `<template>` with:
 </template>
 ```
 
+In the template above, we create a Bulma Hero to display the repo data.
+
 ## Running Nuxt generate
 
 Now that we've created the page templates, we have everything we need to build
-our website, with dynamically generated routes, from Fauna data.
+our website, with dynamically generated routes, using Fauna data.
 
 Build your Nuxt.js Repo Catalogue:
 
@@ -665,6 +674,12 @@ npm run generate
 
 And that's it! You have now a working static site in the `dist` folder, that can
 be served directly from a CDN 👏
+
+To test it locally run:
+
+```shell
+npx serve dist
+```
 
 ## Adding dynamic content to our Repo Catalogue
 
@@ -684,17 +699,19 @@ But still, there are certainly some scenarios where constantly rebuilding the
 site is not viable.
 
 Going back to our Repo Catalogue, suppose we want to add some dynamic data to
-the detail pages, such as number of stars and forks.
+the detail pages, such as description, number of stars, and number of forks.
 
-Clearly, it's not practical to rebuild an entire website whenever this type of
+Clearly, it's not practical to rebuild an entire website whenever any of this
 data changes.
 
 In this section, we'll be adding some dynamic data to the Repo detail page.
-We'll be adding an asynchronous JavaScript API call to the GitHub API page the
+We'll be adding an asynchronous JavaScript API call to the GitHub API to get the
 repo's information.
 
 The request for this data will be made client-side and we'll rely on Vue's
-reactivity to display, we have to add some code `/pages/repos/_slug.js`:
+reactivity to display it.
+
+Add the following code in `/pages/repos/_slug.js`:
 
 ```javascript
 data() {
@@ -705,11 +722,10 @@ data() {
 ```javascript
 mounted() {
   this.$nextTick(async () => {
-    const repoUrlParts = this.repo.repoUrl.split('/')
-    const repoOwner = repoUrlParts[repoUrlParts.length - 2]
-    const repo = repoUrlParts[repoUrlParts.length - 1]
+    const repoOwner = this.repo.owner
+    const repoName = this.repo.name
     const result = await this.$axios.$get(
-      `https://api.github.com/repos/${repoOwner}/${repo}`
+      `https://api.github.com/repos/${repoOwner}/${repoName}`
     )
     this.repoData = result
   })
@@ -726,27 +742,27 @@ under `<section>`:
 </div>
 ```
 
-Now, tell Nuxt to generate the site again, so that this client-side code is
+Now, tell Nuxt to generate the site again, so that the GitHub API call is
 included in the app's bundle:
 
 ```shell
 npm run generate
 ```
 
-And we’re done 💪
+And we’re done!
+
+A dynamic website that loads data in the frontend as the user visits the page
+that displays that data.
 
 ## Conclusion
 
-In this article, we've built a Repo Catalogue static website that you can deploy
-on a host of your choice.
+In this article, we've built a Repo Catalogue static website that you can now
+deploy on a host of your choice.
 
-The site "loads part of the data at build time, and then loads the rest of the
-data in the frontend as the user visits the page that displays that data"
-
-We've also seen that it doesn't always have to be a matter of A/B decision. We
-can aim for a "hybrid" solution whenever possible, using the best of both
-worlds, where we pre-render the most we can, and asynchronously fetch just the
-data we need.
+The intent was to point out that it doesn't always has to be a matter of A/B
+decision. We can aim for a "hybrid" solution whenever possible, using the best
+of both worlds, where we pre-render the most we can, and asynchronously fetch
+just the data we need.
 
 The code for this tutorial can be found in these GitHub repos:
 
@@ -755,11 +771,15 @@ The code for this tutorial can be found in these GitHub repos:
 
 ### What to do next
 
-Here are a couple of further steps
+Here are a couple of ideas to further explore:
 
-- Host on Netlify
-- [Webhooks on content change] - trigger build
-- loader overlay while the client side data is being requested
+- Hosting the Repo Catalogue on Netlify and configuring it to trigger a new
+  build/deploy every time there's a push to `master`
+- Finding a way to trigger new build/deploy whenever content changes in the
+  `repos` database
+- Adding a loader in the repo detail page, while the GitHub API is being
+  requested
+- Implementing error handling for database and API requests
 
 ### Acknowledgements
 
