@@ -668,7 +668,7 @@ npm run generate
 ```
 
 And that's it! You have now a working static site in the `dist` folder, that can
-be served directly from a CDN!
+be served directly from a CDN 👏!
 
 ## Adding dynamic content to our Repo Catalogue
 
@@ -688,7 +688,7 @@ But still, there are certainly some scenarios where constantly rebuilding the
 site is not viable.
 
 Going back to our Repo Catalogue, suppose we want to add some dynamic data to
-the detail pages, such as stars and forks.
+the detail pages, such as number of stars and forks.
 
 Clearly, it's not practical to rebuild an entire website whenever this type of
 data changes.
@@ -701,6 +701,12 @@ The request for this data will be made client-side and we'll rely on Vue's
 reactivity to display, we have to add some code `/pages/repos/_slug.js`:
 
 ```javascript
+data() {
+  return { repoData: {} }
+},
+```
+
+```javascript
 mounted() {
   this.$nextTick(async () => {
     const result = await this.$axios.$get(
@@ -710,6 +716,16 @@ mounted() {
 }
 ```
 
+under `<section>`:
+
+```html
+<div class="container" :style="{ paddingTop: '2rem' }">
+  <p><span class="is-size-5">Description:</span> {{ repoData.description }}</p>
+  <p><span class="is-size-5">Stars:</span> {{ repoData.stargazers_count }}</p>
+  <p><span class="is-size-5">Forks:</span> {{ repoData.forks_count }}</p>
+</div>
+```
+
 Now, tell Nuxt to generate the site again, so that this client-side code is
 included in the app's bundle:
 
@@ -717,7 +733,7 @@ included in the app's bundle:
 npm run generate
 ```
 
-And we’re done!
+And we’re done 💪!
 
 ## Conclusion
 
