@@ -283,7 +283,7 @@ we've already installed in a previous step.
 The driver requires a Fauna Admin Key in order to guarantee that it has the
 correct permissions to access and write data in the `repos` database.
 
-Go to the Fauna dashboard go to Security on the left-hand sidebar to manage the
+From the Fauna dashboard. go to Security on the left-hand sidebar to manage the
 keys for the database Create a new key -> select the database you've just
 created, select the Role Admin you can name the key whatever you want and save
 Go to the Fauna dashboard and from the Security menu create a new key with the
@@ -363,9 +363,9 @@ Create a `data.json` file:
 touch data.json
 ```
 
-Using the format shown above, add an array of repos that will be written to
-Fauna's database. You can either use the same file I've used or tweak it to
-feature your favorite projects.
+Using the format above, add an array of repos that will be written to Fauna's
+database. You can either use the same file I've used or tweak it to feature your
+favorite projects.
 
 Make sure the `simpleIconsName` value exists in the Simple Icons collection. You
 can use the search feature on the [website](https://simpleicons.org/) to get the
@@ -740,18 +740,18 @@ And we’re done 💪
 In this article, we've built a Repo Catalogue static website that you can deploy
 on a host of your choice.
 
-The code for this tutorial can be found in the
-[`fauna-seeder`](https://github.com/ramigs/fauna-seeder) and
-[`repo-catalogue`](https://github.com/ramigs/repo-catalogue) GitHub repos.
-
-"we implemented an approach that loads part of the data at build time, and then
-loads the rest of the data in the frontend as the user visits the page that
-displays that data"
+The site "loads part of the data at build time, and then loads the rest of the
+data in the frontend as the user visits the page that displays that data"
 
 We've also seen that it doesn't always have to be a matter of A/B decision. We
 can aim for a "hybrid" solution whenever possible, using the best of both
 worlds, where we pre-render the most we can, and asynchronously fetch just the
 data we need.
+
+The code for this tutorial can be found in these GitHub repos:
+
+- [`fauna-seeder`](https://github.com/ramigs/fauna-seeder)
+- [`repo-catalogue`](https://github.com/ramigs/repo-catalogue)
 
 ### What to do next
 
@@ -759,6 +759,7 @@ Here are a couple of further steps
 
 - Host on Netlify
 - [Webhooks on content change] - trigger build
+- loader overlay while the client side data is being requested
 
 ### Acknowledgements
 
