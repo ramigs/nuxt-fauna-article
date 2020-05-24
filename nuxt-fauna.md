@@ -6,7 +6,7 @@ a static site, from FaunaDB data.
 Pre-rendering at build time is not all we will be doing. We' ll also display
 additional, more dynamic repo info, using Vue.js for client-side hydration.
 
-Check out the finished demo [here](https://elegant-hopper-28219e.netlify.app/).
+Check out the finished working demo [here](https://elegant-hopper-28219e.netlify.app/).
 
 ## Why a Repository Catalogue?
 
@@ -42,13 +42,12 @@ This observation may then lead us to the question:
   those same results, run them against the same template, and only then, deliver
   the page to the client?".
 
-What if we implement a Jamstack strategy and strive to use the server side build
-to to fetch the category of data that does not change often from an API or
-database and serve HTML and static assets to our site's visitors?
+What if we implement a Jamstack strategy, and strive to use the server side
+build to fetch the repo collection, and serve HTML and static assets to our
+site's visitors?
 
 After all, it's not _that_ often we need to add or delete a repo from the
-catalogue. Only some projects a special place in our heart, and that does not
-happen every day 😄.
+catalogue. Only some projects a special place in our heart 😄
 
 At the end, you'll be able to take this example, adapt and apply it to your
 specific use case. You can also translate this tutorial context for other
@@ -57,13 +56,13 @@ real-time apps very easily, explain as go along in the article.
 ## Jamstack
 
 The concepts of Jamstack and "static-first" are not new and their advantages
-have been [extensively](https://css-tricks.com/static-or-not/) documented
-before. Jamstack architectures allow us to build fast, more secure, and more
-scalable websites.
+have been [extensively](https://css-tricks.com/static-or-not/)
+[documented](https://css-tricks.com/get-static/) before. Jamstack architectures
+allow us to build faster, more secure, and more scalable websites.
 
 With HTML being pre-rendered once and then statically served from a CDN, the
-performance of a website has the potential to be much better. Fetching data at
-the build stage - instead of each time a client requests a page, with minimum
+performance of a website has the potential to be great. Fetching data at the
+build stage - instead of each time a client requests a page, with minimum
 computing overhead.
 
 The term "static" can be a bit misleading - that's why we see "pre-rendered"
@@ -110,7 +109,7 @@ What we're setting to achieve in this tutorial:
 Although it's not the main focus of the article, the supporting `fauna-seeder`
 app that will allows us to populate the FaunaDB database with a single command
 from the terminal. It's just one a way of storing data in FaunaDB - in fact, you
-could be doing with different ways.
+could be doing it in different way of your choice.
 
 ## Pre-requisites
 
@@ -255,22 +254,21 @@ on the left sidebar:
 **PRINTSCREEN**
 
 Then click the "Import Schema" button." Click "GraphQL" in the left sidebar,
-which opens your browser’s file upload. Select the `schema.gql` file:
+which opens your browser’s file upload, and select the `schema.gql` file:
 
 **PRINTSCREEN**
 
-Inside a Fauna database, we have Collections, Indexes and Documents. "FaunaDB
-automatically created the necessary collection for the `Repo` entity.
-Additionally, It also creates the indexes that to support the schema."
+FaunaDB automatically created the necessary collection for the `Repo` entity.
 
-"Besides that, it also creates the indexes that are needed to interact with
-those collections in a meaningful and efficient manner."
+Additionally, it also created the indexes to support the schema and are needed
+to interact with the collection.
 
 At this point we have an empty database, ready to be populated with some repo
 data.
 
 ## Seeding data to Fauna
 
+Inside a Fauna database, we have Collections, Indexes and Documents.
 FaunaDB is a non-relational database that stores data in the JSON format. There
 are three ways of interacting with Fauna data:
 
@@ -289,9 +287,8 @@ Go to the Fauna dashboard go to Security on the left-hand sidebar to manage the
 keys for the database Create a new key -> select the database you've just
 created, select the Role Admin you can name the key whatever you want and save
 Go to the Fauna dashboard and from the Security menu create a new key with the
-admin role, and name it `FAUNA_ADMIN`:
-copy the secret key and save it as after you navigate away from this page it is
-not going to be displayed again
+admin role, and name it `FAUNA_ADMIN`: copy the secret key and save it as after
+you navigate away from this page it is not going to be displayed again
 
 **PRINTSCREEN**
 
@@ -552,9 +549,8 @@ It's quite some code. So, let’s review the different steps of the snippet:
 - Instantiate a Fauna client using the secret key
 - Fetch the entire repo collection using the `allRepos` Index
 - Go through each repo, generate a slug and return an object with the route path
-  and the repo data as its payload pass along the entire user object to the
-  context in \_id.vue.
-- Add the route for the home
+  and the repo data as payload, that will be passed to the page
+- Add the route for the homepage, passing the repo collection as payload
 - Return the array of routes that should be generated
 
 ## Creating the pages
@@ -709,8 +705,12 @@ data() {
 ```javascript
 mounted() {
   this.$nextTick(async () => {
+    const repoUrlParts = this.repo.repoUrl.split('/')
+    const repoOwner = repoUrlParts[repoUrlParts.length - 2]
+    const repo = repoUrlParts[repoUrlParts.length - 1]
     const result = await this.$axios.$get(
-      `https://api.github.com/repos/ramigs/dynamic-order-change-html`)
+      `https://api.github.com/repos/${repoOwner}/${repo}`
+    )
     this.repoData = result
   })
 }
@@ -740,19 +740,18 @@ And we’re done 💪
 In this article, we've built a Repo Catalogue static website that you can deploy
 on a host of your choice.
 
+The code for this tutorial can be found in the
+[`fauna-seeder`](https://github.com/ramigs/fauna-seeder) and
+[`repo-catalogue`](https://github.com/ramigs/repo-catalogue) GitHub repos.
+
 "we implemented an approach that loads part of the data at build time, and then
 loads the rest of the data in the frontend as the user visits the page that
 displays that data"
 
-"The code for this tutorial can be found here the GitHub repos." `fauna-seeder`
-`repo-catalogue`
-
-We've also seen covered One of the key ideas I want to present in this article
-is that it doesn't always have to be a matter of A/B decision. We should aim for
-a "hybrid" solution whenever possible, where we pre-render the most we can, and
-asynchronously fetch just the data we need.
-
-use the best of both worlds
+We've also seen that it doesn't always have to be a matter of A/B decision. We
+can aim for a "hybrid" solution whenever possible, using the best of both
+worlds, where we pre-render the most we can, and asynchronously fetch just the
+data we need.
 
 ### What to do next
 
@@ -762,8 +761,6 @@ Here are a couple of further steps
 - [Webhooks on content change] - trigger build
 
 ### Acknowledgements
-
-https://css-tricks.com/get-static/
 
 https://jamstack.training/p/pre-generate-static-pages-with-dynamic-content
 https://www.smashingmagazine.com/2019/10/bookmarking-application-faunadb-netlify-11ty/
