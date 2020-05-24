@@ -47,7 +47,7 @@ to to fetch the category of data that does not change often from an API or
 database and serve HTML and static assets to our site's visitors?
 
 After all, it's not _that_ often we need to add or delete a repo from the
-catalogue. only some projects a special place in your heart, and that does not
+catalogue. Only some projects a special place in our heart, and that does not
 happen every day 😄.
 
 At the end, you'll be able to take this example, adapt and apply it to your
@@ -559,7 +559,7 @@ It's quite some code. So, let’s review the different steps of the snippet:
 
 ## Creating the pages
 
-Start with `pages/index.vue` and replace the existing `<script>` with:
+Start with `/pages/index.vue` and replace the existing `<script>` with:
 
 ```vue
 <script>
@@ -619,7 +619,7 @@ Now that have access to the data, replace the existing `<template>` with:
 ```
 
 Let's move on with the individual repo detail page. Create the file
-`pages/repos/_slug.vue` and replace the existing `<script>` with:
+`/pages/repos/_slug.vue` and replace the existing `<script>` with:
 
 ```vue
 <script>
@@ -668,7 +668,7 @@ npm run generate
 ```
 
 And that's it! You have now a working static site in the `dist` folder, that can
-be served directly from a CDN 👏!
+be served directly from a CDN 👏
 
 ## Adding dynamic content to our Repo Catalogue
 
@@ -733,7 +733,7 @@ included in the app's bundle:
 npm run generate
 ```
 
-And we’re done 💪!
+And we’re done 💪
 
 ## Conclusion
 
