@@ -67,14 +67,15 @@ computing overhead.
 
 The term "static" can be a bit misleading - that's why we see "pre-rendered"
 being used interchangeably. When we build a Jamstack app, it doesn't mean we
-have to compromise on dynamic features or dynamic content.
+have to compromise on dynamic content and features.
 
-"Using the server side build to get the provides multiple benefits" "Enhance
-client side, if really needed.
+We can build the site beforehand with the type of data that does not change
+often, and augment it client-side, only if and when that's needed.
 
-The widespread of functionality APIs, makes way for common tasks - such as
-authentication, e-commerce, and data storage - that used to be implemented over
-and over, now be delegated to the professional service providers.
+Moreover, the widespread of functionality APIs, makes way for common tasks -
+such as authentication, e-commerce, and data storage - that used to be
+implemented over and over, now be delegated to the professional service
+providers.
 
 ## FaunaDB
 
@@ -87,7 +88,7 @@ to host and manage our own database. Zero server operations and transparent
 scalability out-of-the-box.
 
 From a developer's perspective this is awesome, because it allows us to be more
-productive and focus on the logic of the app we're building.
+productive and focus solely on the logic of the app we're building.
 
 ## Nuxt.js
 
@@ -106,9 +107,9 @@ What we're setting to achieve in this tutorial:
 - building a helper app that we'll use to seed Fauna's database
 
 Although it's not the main focus of the article, the supporting `fauna-seeder`
-app that will allows us to populate the FaunaDB database with a single command
-from the terminal. It's just one a way of storing data in FaunaDB - in fact, you
-could be doing it in different way of your choice.
+app will allows us to populate the FaunaDB database with a single command from
+the terminal. It's just one a way of storing data in FaunaDB - in fact, you
+could be doing this step in a different way of your choice.
 
 ## Pre-requisites
 
@@ -121,7 +122,7 @@ knowledge of the following technologies is beneficial:
 
 Before you begin, you'll need:
 
-- Node and npm installed
+- Node, npm, and npx installed
 - A [FaunaDB account](https://dashboard.fauna.com/accounts/register)
 
 Let's dive in!
@@ -129,14 +130,14 @@ Let's dive in!
 ## Modelling our data
 
 First things first, we begin by specifying the data model. The goal is to store
-a collection of repos in the Fauna database.
+a collection of repos in a Fauna database.
 
 Each repo is represented by the following fields:
 
 - project name
 - GitHub repo URL
-- project SVG logo
-- project main color hex code
+- project logo
+- project main color
 
 ## Writing the GraphQL schema
 
@@ -189,14 +190,18 @@ We've installed three dependencies:
 - simple-icons: [Simple Icons](https://simpleicons.org/) npm package
 - dotenv: to store and load Fauna's secret key from a `.env` file
 
-FQL the native API for querying the data FQL functional, composable
+[The Fauna Query Language](https://docs.fauna.com/fauna/current/api/fql/) (FQL)
+is the native API for querying FaunaDB. [Fauna
+drivers](https://docs.fauna.com/fauna/current/drivers/) (available for several
+programming languages) abstract the FQL, allowing developers to programmatically
+interact with FaunaDB databases.
 
 Simple Icons is a cool project that collects SVG icons and colors for popular
 brands. We'll be using their [npm
-package](https://github.com/simple-icons/simple-icons) to dynamically fetch the
-SVG logo and the hex color code of each project, when the seeder app runs.
+package](https://github.com/simple-icons/simple-icons) to get the SVG logo and
+the hex color code of each project, when the seeder app runs.
 
-Let's now write the GraphQL schema. Create a new file `schemal.graphql`
+Let's now write the GraphQL schema. Create a new file `schema.graphql`
 and add the following content:
 
 ```shell
@@ -235,7 +240,7 @@ Log in to your Fauna account.
 Visit the [dashboard](https://dashboard.fauna.com/) and create a new database,
 named `repos`:
 
-**PRINTSCREEN**
+![Create new FaunaDB database](./faunadb-new-database.png)
 
 ## Importing the schema
 
@@ -268,8 +273,8 @@ Inside a Fauna database, we have Collections, Indexes and Documents.
 FaunaDB is a non-relational database that stores data in the JSON format. There
 are three ways of interacting with Fauna data:
 
-- Fauna drivers (available in several programming languages)
-- Interactive shell using The Fauna Query Language (FQL)
+- Fauna drivers
+- Interactive Shell using FQL
 - GraphQL Playground
 - GraphQL API using a GraphQL client (e.g., Apollo)
 
@@ -333,6 +338,9 @@ exports.query = query;
 ```
 
 What are we doing there
+to make it easier to include local data structures in queries, and for
+processing query results. FQL the native API for querying the data FQL
+functional, composable
 
 ## Repo data
 
@@ -404,7 +412,7 @@ client
     )
   )
   .then(console.log("Repos seeded successfully to FaunaDB"))
-  .catch((err) => console.log("Failed to add repo to FaunaDB", err));
+  .catch((err) => console.log("Failed to see repo to FaunaDB", err));
 ```
 
 Let's break down what we've done there:
@@ -614,7 +622,7 @@ Now that have access to the data, replace the existing `<template>` with:
 </template>
 ```
 
-In the template above, we go through each repo and display it as a Bulma
+In the template above, we've gone through each repo and displayed it as a Bulma
 Card.
 
 Let's move on to the individual repo detail page. Create a new file
@@ -655,7 +663,7 @@ Now that have access to the data, replace the existing `<template>` with:
 </template>
 ```
 
-In the template above, we create a Bulma Hero to display the repo data.
+In the template above, we've created a Bulma Hero to display the repo data.
 
 ## Running Nuxt generate
 
@@ -707,13 +715,18 @@ repo's information.
 The request for this data will be made client-side and we'll rely on Vue's
 reactivity to display it.
 
-Add the following code in `/pages/repos/_slug.js`:
+In `/pages/repos/_slug.js`, declare a `repoData` object to hold the response
+data:
 
 ```javascript
 data() {
   return { repoData: {} }
 },
 ```
+
+The GitHub API provides an endpoint `GET /repos/:owner/:repo` that returns a
+repo's info. Use Vue's `mounted` hook to call the GitHub API from the client,
+with axios:
 
 ```javascript
 mounted() {
@@ -728,7 +741,7 @@ mounted() {
 }
 ```
 
-under `<section>`:
+Under the Hero `<section>`, create a container to display the dynamic data:
 
 ```html
 <div class="container" :style="{ paddingTop: '2rem' }">
