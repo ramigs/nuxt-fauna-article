@@ -149,7 +149,7 @@ define our repo data, The schema will be used in the next step to create the
 database and specify what resources the database will provide.
 
 > "GraphQL is a specification for an API query language and a server engine
-> capable of executing such queries."_[Production Ready GraphQL](https://book.productionreadygraphql.com/)_
+> capable of executing such queries." - _[Production Ready GraphQL](https://book.productionreadygraphql.com/)_
 
 Create a directory for the project and navigate to it:
 
@@ -277,7 +277,7 @@ a non-relational database that stores data in the JSON format.
 > "A Collection is a categorized group of data. Each piece of data takes the
 > form of a Document. A Document is a“single, changeable record within a FaunaDB
 > database,” according to Fauna’s documentation. You can think of Collections as
-> a traditional database table and a Document as a row."_[Bryan Robinson](https://www.smashingmagazine.com/2019/10/bookmarking-application-faunadb-netlify-11ty/)_
+> a traditional database table and a Document as a row." - _[Bryan Robinson](https://www.smashingmagazine.com/2019/10/bookmarking-application-faunadb-netlify-11ty/)_
 
 There are four ways of interacting with Fauna data:
 
