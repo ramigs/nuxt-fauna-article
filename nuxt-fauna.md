@@ -696,6 +696,8 @@ npm run generate
 And that's it! You have now a working static site in the `dist` folder, that can
 be served directly from a CDN 👏
 
+![Repo Catalogue](./fauna-repo-catalogue.png)
+
 To test it locally run:
 
 ```shell
