@@ -34,7 +34,7 @@ identify two categories of data:
 
 - some that does not change often or not at all (e.g., project name, logo, repo
   URL)
-- some that changes frequently (e.g., number of stars and forks)
+- some that changes frequently (e.g., repository number of stars and forks)
 
 This observation may then lead us to the question:
 
@@ -46,8 +46,8 @@ What if we implement a Jamstack strategy, and strive to use the server side
 build to fetch the repo collection, and serve HTML and static assets to our
 site's visitors?
 
-After all, it's not _that_ often we need to add or delete a repo from the
-catalogue. Only some projects a special place in our heart 😄
+After all, only some projects a special place in our heart 😄, so it's not
+_that_ often we need to add or delete a repo from the catalogue.
 
 At the end, you'll be able to take this example, adapt and apply it to your
 specific use case. You can also translate this tutorial context for other
@@ -60,10 +60,10 @@ have been [extensively](https://css-tricks.com/static-or-not/)
 [documented](https://css-tricks.com/get-static/) before. Jamstack architectures
 allow us to build faster, more secure, more scalable websites.
 
-With HTML being pre-rendered once and then statically served from a CDN, the
-performance of a website has the potential to be great. Fetching data at the
-build stage - instead of each time a client requests a page, with minimum
-computing overhead.
+With HTML being pre-rendered once and then statically served from a CDN, a
+website has the potential for great performance. Fetching data at the build
+stage - instead of each time a client requests a page, with minimum computing
+overhead.
 
 The term "static" can be a bit misleading - that's why we see "pre-rendered"
 being used interchangeably. When we build a Jamstack app, it doesn't mean we
@@ -125,7 +125,7 @@ Before you begin, you'll need:
 - Node, npm, and npx installed
 - A [FaunaDB account](https://dashboard.fauna.com/accounts/register)
 
-Let's dive in!
+Without further ado, let's dive in!
 
 ## Modelling our data
 
@@ -240,29 +240,29 @@ Log in to your Fauna account.
 Visit the [dashboard](https://dashboard.fauna.com/) and create a new database,
 named `repos`:
 
-![Create new FaunaDB database](./faunadb-new-database.png)
+![Create a new FaunaDB database](./faunadb-new-database.png)
 
 ## Importing the schema
 
 Now that the database is created, we can import the GraphQL schema into FaunaDB.
 
-FaunaDB has a feature that allows us to import a GraphQL schema, that besides
-creating the database, also provides an "instant" GraphQL endpoint.
+FaunaDB has a feature that allows us to import a GraphQL schema to create a
+database, with an "instant" GraphQL endpoint for it.
 
 We can upload our `schema.gql` file, via FaunaDB Console by clicking "GraphQL"
 on the left sidebar:
 
-**PRINTSCREEN**
+![Fauna GraphQL Playground](./fauna-graphql-playground.png)
 
-Then click the "Import Schema" button." Click "GraphQL" in the left sidebar,
-which opens your browser’s file upload, and select the `schema.gql` file:
-
-**PRINTSCREEN**
+Then click the "Import Schema" button, which opens your browser’s file upload,
+and select the `schema.gql` file:
 
 FaunaDB automatically created the necessary collection for the `Repo` entity.
 
 Additionally, it also created the indexes to support the schema and are needed
-to interact with the collection.
+to interact with the collection:
+
+![Fauna GraphQL Playground](./fauna-db-overview.png)
 
 At this point we have an empty database, ready to be populated with some repo
 data.
@@ -290,7 +290,7 @@ new key with "Admin" Role.
 Copy the generated key and save it somewhere safe, as after you navigate away
 from this page it will not be displayed again:
 
-**PRINTSCREEN**
+![Create a new FaunaDB database](./faunadb-new-database.png)
 
 Create a `.env` file in the root directory of the `fauna-seeder` app:
 
@@ -426,7 +426,7 @@ node seed.js
 Navigate to "Collections" from the sidebar menu, and confirm that the data was
 written successfully.
 
-**PRINTSCREEN**
+![Create a new FaunaDB database](./faunadb-new-database.png)
 
 ## Nuxt Repo Catalogue
 
@@ -459,7 +459,7 @@ npm install faunadb slugify
 The same way we did for the `fauna-seeder` app, let's create a new Fauna key -
 this time with a "Server" role:
 
-**PRINTSCREEN**
+![Create a new FaunaDB database](./faunadb-new-database.png)
 
 Edit the `.env` file and paste the key you've just generated.
 
@@ -783,9 +783,9 @@ The code for this tutorial can be found in these GitHub repos:
 Here are a couple of ideas to further explore:
 
 - Hosting the Repo Catalogue on Netlify and configuring it to trigger a new
-  build/deploy every time there's a push to `master`
-- Finding a way to trigger new build/deploy whenever content changes in the
-  `repos` database
+  `repo-catalogue` build/deploy every time there's a push to `master`
+- Finding a way to trigger a new `repo-catalogue` build/deploy whenever content
+  changes in Fauna's database
 - Adding a loader in the repo detail page, while the GitHub API is being
   requested
 - Implementing error handling for database and API requests
