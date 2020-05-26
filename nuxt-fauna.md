@@ -284,7 +284,8 @@ There are four ways of interacting with Fauna data:
 - Fauna drivers
 - Interactive Shell using FQL
 - GraphQL Playground
-- GraphQL API using a GraphQL client (e.g., Apollo)
+- GraphQL API using a GraphQL client (e.g.,
+  [Apollo](https://www.apollographql.com/client/))
 
 We'll use the JavaScript driver, that we've already installed in a previous
 step.
@@ -326,6 +327,10 @@ touch db-connection.js
 
 Add the following to `db-connection.js`:
 
+Reference this article once it's published, for the use of this code:
+https://www.dropbox.com/scl/fi/slltsmir86il06sniimsk/Jamstack-and-the-power-of-serverless-databases-with-FaunaDB.-Part-1..paper?dl=0&rlkey=063ep7p59fo45lkioriwaqflt
+https://www.dropbox.com/scl/fi/gjhybns9hdsgbxyskjcgb/Jamstack-and-the-power-os-serverless-databases-with-FaunaDB.-Part-2..paper?dl=0&rlkey=9xqnw4md4tvvdqrzuw3a4y55g
+
 ```javascript
 require("dotenv").config();
 const faunadb = require("faunadb");
@@ -345,10 +350,10 @@ exports.client = createClient();
 exports.query = query;
 ```
 
-The function will try do load the secret key, and in case of success, proceeds
+The function will try do load the secret key, and in case of success, proceed
 with creating and returning a connection to the database. Finally, the
 `createClient` function is exported, alongside the driver's `query` variable,
-which will allows us to seed the data using FQL's functional, composable style.
+which will allows us to seed the data in FQL's functional, composable style.
 
 ## Repo data
 
@@ -394,9 +399,6 @@ touch seed.js
 ```
 
 This is the code that will run to populate the `Repo` collection:
-Reference this article for this code used
-https://www.dropbox.com/scl/fi/slltsmir86il06sniimsk/Jamstack-and-the-power-of-serverless-databases-with-FaunaDB.-Part-1..paper?dl=0&rlkey=063ep7p59fo45lkioriwaqflt
-https://www.dropbox.com/scl/fi/gjhybns9hdsgbxyskjcgb/Jamstack-and-the-power-os-serverless-databases-with-FaunaDB.-Part-2..paper?dl=0&rlkey=9xqnw4md4tvvdqrzuw3a4y55g
 
 ```javascript
 const { client, query } = require("./graphql/db-connection");
@@ -482,9 +484,9 @@ npm install faunadb slugify
 ### Fauna key
 
 The same way we did for the `fauna-seeder` app, let's create a new Fauna key -
-this time with a "Server" role:
+this time with "Server" Role:
 
-![Create a new FaunaDB database](./faunadb-new-database.png)
+![Create a Fauna Server Key](./faunadb-new-server-key.png)
 
 Edit the `.env` file and paste the key you've just generated.
 
