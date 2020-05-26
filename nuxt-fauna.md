@@ -259,8 +259,8 @@ and select the `schema.gql` file:
 
 FaunaDB automatically created the necessary collection for the `Repo` entity.
 
-Additionally, it also created the indexes to support the schema and are needed
-to interact with the collection:
+Additionally, it also created the indexes that support the schema and interact
+with the collection:
 
 ![Fauna GraphQL Playground](./fauna-db-overview.png)
 
@@ -269,9 +269,9 @@ data.
 
 ## Seeding data to Fauna
 
-Inside a Fauna database, we have Collections, Indexes and Documents.
-FaunaDB is a non-relational database that stores data in the JSON format. There
-are three ways of interacting with Fauna data:
+Inside a Fauna database, we have Collections, Indexes and Documents. FaunaDB is
+a non-relational database that stores data in the JSON format. There are four
+ways of interacting with Fauna data:
 
 - Fauna drivers
 - Interactive Shell using FQL
@@ -281,16 +281,16 @@ are three ways of interacting with Fauna data:
 We'll use the JavaScript [driver](https://github.com/fauna/faunadb-js), that
 we've already installed in a previous step.
 
-The driver requires a Fauna Admin Key in order to access and write data in the
-`repos` database.
+The driver requires a Fauna Admin Key in order to authenticate connections and
+write data in the `repos` database.
 
-From the database's dashboard, go to "Security" on the left-hand, and create a
-new key with "Admin" Role.
+From the database's dashboard, go to "Security" on the left-hand sidebar, and create a
+new key with "Admin" Role:
+
+![Create a Fauna Admin Key](./faunadb-new-admin-key.png)
 
 Copy the generated key and save it somewhere safe, as after you navigate away
-from this page it will not be displayed again:
-
-![Create a new FaunaDB database](./faunadb-new-database.png)
+from this page it will not be displayed again.
 
 Create a `.env` file in the root directory of the `fauna-seeder` app:
 
@@ -324,11 +324,11 @@ const faunadb = require("faunadb");
 const query = faunadb.query;
 
 function createClient() {
-  if (!process.env.FAUNA_ADMIN) {
-    throw new Error("FAUNA_ADMIN key not found");
+  if (!process.env.FAUNA_ADMIN_KEY) {
+    throw new Error("FAUNA_ADMIN_KEY not found");
   }
   const client = new faunadb.Client({
-    secret: process.env.FAUNA_ADMIN,
+    secret: process.env.FAUNA_ADMIN_KEY,
   });
   return client;
 }
@@ -337,10 +337,10 @@ exports.client = createClient();
 exports.query = query;
 ```
 
-What are we doing there
-to make it easier to include local data structures in queries, and for
-processing query results. FQL the native API for querying the data FQL
-functional, composable
+The function will try do load the secret key, and in case of success, proceeds
+with creating a connection to the database. Finally, the `createClient` function
+is exported, alongside the driver's `query` variable, which will allows us to
+seed the data using FQL's functional, composable style.
 
 ## Repo data
 
@@ -368,8 +368,9 @@ touch data.json
 ```
 
 Using the format above, add an array of repos that will be written to Fauna's
-database. You can either use the same file I've used or tweak it to feature your
-favorite projects.
+database. You can either use the same
+[file](https://github.com/ramigs/fauna-seeder/blob/master/data.json) I've used
+or tweak it to feature your favorite projects.
 
 Make sure the `simpleIconsName` value exists in the Simple Icons collection. You
 can use the search feature on the [website](https://simpleicons.org/) to get the
