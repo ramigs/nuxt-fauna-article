@@ -604,7 +604,7 @@ Replace the content of `<script>` with:
 ```vue
 <script>
 export default {
-  asyncData({ params, error, payload, $axios }) {
+  asyncData({ payload }) {
     return { repos: payload };
   },
 };
@@ -638,7 +638,7 @@ Now that have access to the data, replace the existing `<template>` with:
           >
             <a :href="`/repos/${repo.slug}`">
               <figure
-                :style="{ maxWidth: '20%' }"
+                :style="{ maxWidth: '20%', margin: '0 auto', padding: '2em 0' }"
                 v-html="repo.svgLogo"
               ></figure>
             </a>
@@ -667,7 +667,7 @@ Let's move on to the individual repo detail page. Create a new file
 ```vue
 <script>
 export default {
-  asyncData({ params, error, payload, $axios }) {
+  asyncData({ payload }) {
     if (payload) return { repo: payload };
   },
 };
@@ -797,6 +797,8 @@ npm run generate
 ```
 
 And we’re done!
+
+![Nuxt.js detail page](./fauna-nuxt-detail-page.png)
 
 A dynamic website that loads data in the frontend as the user visits the page
 that displays that data.
