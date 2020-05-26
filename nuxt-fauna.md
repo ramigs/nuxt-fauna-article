@@ -538,42 +538,46 @@ Let's add the `generate` property in `nuxt.config.js`:
 
 ```javascript
 generate: {
-    async routes() {
-      const faunadb = require('faunadb')
-      const query = faunadb.query
-      const slugify = require('slugify')
-      const q = query
-      if (!process.env.FAUNA_SERVER_KEY) {
-        throw new Error('FAUNA_SERVER_KEY not found.')
-      }
-      const client = new faunadb.Client({
-        secret: process.env.FAUNA_SERVER_KEY
-      })
-      const result = await client.query(
-        q.Map(
-          q.Paginate(q.Match(q.Index('allRepos'))),
-          q.Lambda('X', q.Get(q.Var('X')))
-        )
-      )
-      const repos = result.data.map((repo) => repo.data)
-      const routes = repos.map((repo) => {
-        const repoUrlParts = repo.repoUrl.split('/')
-        const slug = slugify(repoUrlParts[repoUrlParts.length - 1], {
-          remove: /[*+~.()'"!:@]/g
-        })
-        repo.slug = slug
-        return {
-          route: '/repos/' + slug,
-          payload: repo
-        }
-      })
-      routes.push({
-        route: '/',
-        payload: repos
-      })
-      return routes
+  async routes() {
+    const faunadb = require('faunadb')
+    const query = faunadb.query
+    const slugify = require('slugify')
+    const q = query
+    if (!process.env.FAUNA_SERVER_KEY) {
+      throw new Error('FAUNA_SERVER_KEY not found.')
     }
+    const client = new faunadb.Client({
+      secret: process.env.FAUNA_SERVER_KEY
+    })
+    const result = await client.query(
+      q.Map(
+        q.Paginate(q.Match(q.Index('allRepos'))),
+        q.Lambda('X', q.Get(q.Var('X')))
+      )
+    )
+    const repos = result.data.map((repo) => repo.data)
+    const routes = repos.map((repo) => {
+      const repoUrlParts = repo.repoUrl.split('/')
+      const repoOwner = repoUrlParts[repoUrlParts.length - 2]
+      const repoName = repoUrlParts[repoUrlParts.length - 1]
+      const slug = slugify(repoName, {
+        remove: /[*+~.()'"!:@]/g
+      })
+      repo.slug = slug
+      repo.owner = repoOwner
+      repo.name = repoName
+      return {
+        route: '/repos/' + slug,
+        payload: repo
+      }
+    })
+    routes.push({
+      route: '/',
+      payload: repos
+    })
+    return routes
   }
+}
 ```
 
 It's quite some code. So, let’s review the different steps of the snippet:
@@ -585,7 +589,7 @@ It's quite some code. So, let’s review the different steps of the snippet:
 - Fetch the entire repo collection using the `allRepos` Index
 - Go through each repo, generate a slug and return an object with the route path
   and the repo data as payload, that will be passed to the page
-- Add the route for the homepage, passing the repo collection as payload
+- Add the route for the home page, passing the repo collection as payload
 - Return the array of routes that should be generated
 
 ## Creating the pages
