@@ -287,7 +287,7 @@ write data in the `repos` database.
 From the database's dashboard, go to "Security" on the left-hand sidebar, and create a
 new key with "Admin" Role:
 
-![Create a Fauna Admin Key](./faunadb-new-admin-key.png)
+![Create a Fauna Admin Key](./fauna-new-admin-key.png)
 
 Copy the generated key and save it somewhere safe, as after you navigate away
 from this page it will not be displayed again.
@@ -338,9 +338,9 @@ exports.query = query;
 ```
 
 The function will try do load the secret key, and in case of success, proceeds
-with creating a connection to the database. Finally, the `createClient` function
-is exported, alongside the driver's `query` variable, which will allows us to
-seed the data using FQL's functional, composable style.
+with creating and returning a connection to the database. Finally, the
+`createClient` function is exported, alongside the driver's `query` variable,
+which will allows us to seed the data using FQL's functional, composable style.
 
 ## Repo data
 
