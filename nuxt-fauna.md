@@ -18,9 +18,8 @@ can customize to display repo information that is more relevant to you.
 
 Although we'll be building a very concrete implementation, its main purpose is
 to serve as an example to the core underlying idea of this article. The benefits
-of pre-rendering as much as we can of a website, and through client-side
-JavaScript. sprinkle it with just the more dynamic type of data. [static
-first](https://css-tricks.com/static-first-pre-generated-jamstack-sites-with-serverless-rendering-as-a-fallback/)
+of pre-rendering as much as we can, and through client-side JavaScript, load the
+rest of the data only when the user visits the page.
 
 > "It’s usually a good idea to load as much data at build time as possible to
 > improve page performance. But if the data isn’t needed by all clients, or too
@@ -57,8 +56,8 @@ real-time apps very easily, explain as go along in the article.
 
 The concepts of Jamstack and "static-first" are not new and their advantages
 have been [extensively](https://css-tricks.com/static-or-not/)
-[documented](https://css-tricks.com/get-static/) before. Jamstack architectures
-allow us to build faster, more secure, more scalable websites.
+[documented](https://css-tricks.com/get-static/) [before](https://css-tricks.com/static-first-pre-generated-jamstack-sites-with-serverless-rendering-as-a-fallback/).
+Jamstack architectures allow us to build faster, more secure, more scalable websites.
 
 With HTML being pre-rendered once and then statically served from a CDN, a
 website has the potential for great performance. Fetching data at the build
@@ -275,7 +274,7 @@ Inside a Fauna database, we have Collections, Indexes and Documents. FaunaDB is
 a non-relational database that stores data in the JSON format.
 
 > "A Collection is a categorized group of data. Each piece of data takes the
-> form of a Document. A Document is a“single, changeable record within a FaunaDB
+> form of a Document. A Document is a “single, changeable record within a FaunaDB
 > database,” according to Fauna’s documentation. You can think of Collections as
 > a traditional database table and a Document as a row." - _[Bryan Robinson](https://www.smashingmagazine.com/2019/10/bookmarking-application-faunadb-netlify-11ty/)_
 
@@ -466,7 +465,7 @@ npx create-nuxt-app repo-catalogue
 
 Go through the guide and select the following options:
 
-- axios and dotenv in the **Modules** step
+- axios and dotenv in the **Nuxt.js modules** step
 - Bulma in the **UI framework** step, to style our app
 
 ![Create Nuxt app](./create-nuxt-app-options.png)
