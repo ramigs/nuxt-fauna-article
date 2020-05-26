@@ -326,9 +326,8 @@ touch db-connection.js
 
 Add the following to `db-connection.js`:
 
-Reference this article once it's published, for the use of this code:
-https://www.dropbox.com/scl/fi/slltsmir86il06sniimsk/Jamstack-and-the-power-of-serverless-databases-with-FaunaDB.-Part-1..paper?dl=0&rlkey=063ep7p59fo45lkioriwaqflt
-https://www.dropbox.com/scl/fi/gjhybns9hdsgbxyskjcgb/Jamstack-and-the-power-os-serverless-databases-with-FaunaDB.-Part-2..paper?dl=0&rlkey=9xqnw4md4tvvdqrzuw3a4y55g
+Reference this article once it's published, for the use of this code snippet:
+"Jamstack and the power of serverless databases with FaunaDB"
 
 ```javascript
 require("dotenv").config();
@@ -429,9 +428,24 @@ client
   .catch((err) => console.log("Failed to seed repos to FaunaDB", err));
 ```
 
-Let's break down what we've done there:
+Let's review what we did:
 
-We're ready to add documents to the `Repo` collection:
+- Import functions `client` and `query` from `./graphql/db-connection`
+- Import `simple-icons` package
+- Import list of repos from `./data.json`
+- Go through each repo, get the SVG logo and the hex color code from
+  `simple-icons` and add the properties accordingly
+- Delete property `simpleIconsName` from the repo, since we don't want to send
+  it to the database
+- Use the driver to map over the array of repos and create a new document for
+  each one, in the `Repo` collection
+
+Notice that `query` operates as a transaction, which means that if an error
+occurs, none of the repos will written in the database.
+
+If everything goes as expected, we print a success message.
+
+We're now ready to add documents to the `Repo` collection:
 
 ```shell
 node seed.js
