@@ -451,7 +451,7 @@ node seed.js
 Navigate to "Collections" from the sidebar menu, and confirm that the data was
 written successfully:
 
-![Create a new FaunaDB database](./faunadb-new-database.png)
+![Create a new FaunaDB database](./fauna-new-database.png)
 
 ## Nuxt Repo Catalogue
 
@@ -486,7 +486,7 @@ npm install faunadb slugify
 The same way we did for the `fauna-seeder` app, let's create a new Fauna key -
 this time with "Server" Role:
 
-![Create a Fauna Server Key](./faunadb-new-server-key.png)
+![Create a Fauna Server Key](./fauna-new-server-key.png)
 
 Edit the `.env` file and paste the key you've just generated.
 
