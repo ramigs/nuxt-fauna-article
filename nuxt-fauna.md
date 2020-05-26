@@ -134,10 +134,10 @@ a collection of repos in a Fauna database.
 
 Each repo is represented by the following fields:
 
-- project name
-- GitHub repo URL
-- project logo
-- project main color
+- project **name**
+- GitHub **repo URL**
+- project **logo**
+- project **color**
 
 ## Writing the GraphQL schema
 
@@ -149,7 +149,7 @@ define our repo data, The schema will be used in the next step to create the
 database and specify what resources the database will provide.
 
 > "GraphQL is a specification for an API query language and a server engine
-> capable of executing such queries."[Production Ready GraphQL](https://book.productionreadygraphql.com/)
+> capable of executing such queries."_[Production Ready GraphQL](https://book.productionreadygraphql.com/)_
 
 Create a directory for the project and navigate to it:
 
@@ -272,8 +272,14 @@ data.
 ## Seeding data to Fauna
 
 Inside a Fauna database, we have Collections, Indexes and Documents. FaunaDB is
-a non-relational database that stores data in the JSON format. There are four
-ways of interacting with Fauna data:
+a non-relational database that stores data in the JSON format.
+
+> "A Collection is a categorized group of data. Each piece of data takes the
+> form of a Document. A Document is a“single, changeable record within a FaunaDB
+> database,” according to Fauna’s documentation. You can think of Collections as
+> a traditional database table and a Document as a row."_[Bryan Robinson](https://www.smashingmagazine.com/2019/10/bookmarking-application-faunadb-netlify-11ty/)_
+
+There are four ways of interacting with Fauna data:
 
 - Fauna drivers
 - Interactive Shell using FQL
@@ -388,6 +394,9 @@ touch seed.js
 ```
 
 This is the code that will run to populate the `Repo` collection:
+Reference this article for this code used
+https://www.dropbox.com/scl/fi/slltsmir86il06sniimsk/Jamstack-and-the-power-of-serverless-databases-with-FaunaDB.-Part-1..paper?dl=0&rlkey=063ep7p59fo45lkioriwaqflt
+https://www.dropbox.com/scl/fi/gjhybns9hdsgbxyskjcgb/Jamstack-and-the-power-os-serverless-databases-with-FaunaDB.-Part-2..paper?dl=0&rlkey=9xqnw4md4tvvdqrzuw3a4y55g
 
 ```javascript
 const { client, query } = require("./graphql/db-connection");
@@ -516,7 +525,8 @@ dynamic routes.
 When running `nuxt generate`, Nuxt.js will use the configuration defined in the
 `generate` property, to pre-render the site.
 
-- Define an async function called main to send queries to the database
+We'll write a function `routes` that reads the repo data from the database and
+returns the array of routes to be generated.
 
 Let's add the `generate` property in `nuxt.config.js`:
 
@@ -805,20 +815,3 @@ Here are a couple of ideas to further explore:
 - Adding a loader in the repo detail page, while the GitHub API is being
   requested
 - Implementing error handling for database and API requests
-
-### Acknowledgements
-
-https://jamstack.training/p/pre-generate-static-pages-with-dynamic-content
-https://www.smashingmagazine.com/2019/10/bookmarking-application-faunadb-netlify-11ty/
-https://css-tricks.com/consistent-backends-and-ux-why-should-you-care/?utm_source=hootsuite&utm_medium=twitter
-
-https://fauna.com/blog/building-a-serverless-jamstack-app-with-faunadb-cloud-part-1
-https://github.com/netlify/netlify-faunadb-example
-https://www.netlify.com/blog/2018/07/09/building-serverless-crud-apps-with-netlify-functions-faunadb/
-
-https://devops.com/defining-the-database-requirements-of-dynamic-jamstack-applications/?utm_source=hootsuite&utm_medium=twitter
-
-https://www.youtube.com/watch?v=Qkc8p4D6JM0
-
-https://www.dropbox.com/scl/fi/slltsmir86il06sniimsk/Jamstack-and-the-power-of-serverless-databases-with-FaunaDB.-Part-1..paper?dl=0&rlkey=063ep7p59fo45lkioriwaqflt
-https://www.dropbox.com/scl/fi/gjhybns9hdsgbxyskjcgb/Jamstack-and-the-power-os-serverless-databases-with-FaunaDB.-Part-2..paper?dl=0&rlkey=9xqnw4md4tvvdqrzuw3a4y55g
