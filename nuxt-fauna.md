@@ -78,8 +78,8 @@ providers.
 
 ## FaunaDB
 
-FaunaDB is globally distributed, low-latency database, with native GraphQL
-support, that promises to be always consistent and always secure.
+[Fauna](https://fauna.com/) is globally distributed, low-latency database, with
+native GraphQL support, that promises to be always consistent and always secure.
 
 As a serverless database, FaunaDB allows our applications to access data "as a
 service". Contrary to more "traditional" relational databases, there's no need
@@ -91,8 +91,9 @@ productive and focus solely on the logic of the app we're building.
 
 ## Nuxt.js
 
-Nuxt.js is an open-source web application framework built on top of Vue.js. It
-is well known for its SSR capabilities, but it can also do static.
+[Nuxt.js](https://nuxtjs.org/) is an open-source web application framework built
+on top of Vue.js. It is well known for its SSR capabilities, but it can also do
+static.
 
 Instead of having a Node server process each client request - eventually
 fetching data from an API or database in between, we'll be using Nuxt as a
