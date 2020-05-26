@@ -425,21 +425,11 @@ client
       )
     )
   )
-  .then(console.log("Repos seeded successfully in FaunaDB"))
-  .catch((err) => console.log("Failed to add repo to FaunaDB", err));
+  .then(console.log("Repos seeded successfully to FaunaDB"))
+  .catch((err) => console.log("Failed to seed repos to FaunaDB", err));
 ```
 
 Let's break down what we've done there:
-
-- Import the `faunadb` driver from `node_modules`
-- Import the `slugify` package from `node_modules`
-- Load the Fauna secret key from `.env`
-- Instantiate a Fauna client using the secret key
-- Fetch the entire repo collection using the `allRepos` Index
-- Go through each repo, generate a slug and return an object with the route path
-  and the repo data as payload, that will be passed to the page
-- Add the route for the homepage, passing the repo collection as payload
-- Return the array of routes that should be generated
 
 We're ready to add documents to the `Repo` collection:
 
@@ -450,7 +440,7 @@ node seed.js
 Navigate to "Collections" from the sidebar menu, and confirm that the data was
 written successfully:
 
-![Create a new FaunaDB database](./fauna-new-database.png)
+![Fauna database seeded successfully](./fauna-seeded-success.png)
 
 ## Nuxt Repo Catalogue
 
