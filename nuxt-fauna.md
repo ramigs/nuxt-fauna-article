@@ -26,7 +26,7 @@ rest of the data only when the user visits the page.
 > big to be sent to the client all at once, we can split things up and switch to
 > on-demand loading on the client. This is the case for user-specific data,
 > pagination, or any data that changes rather frequently and might be outdated by
-> the time it reaches the user. _[Build a dynamic JAMstack app with GatsbyJS and FaunaDB](https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/)_
+> the time it reaches the user." - _[Build a dynamic JAMstack app with GatsbyJS and FaunaDB](https://css-tricks.com/build-a-dynamic-jamstack-app-with-gatsbyjs-and-faunadb/)_
 
 When analyzing the requirements for a Repo Catalogue, we can straight away
 identify two categories of data:
@@ -78,13 +78,17 @@ providers.
 
 ## FaunaDB
 
-[Fauna](https://fauna.com/) is globally distributed, low-latency database, with
+[Fauna](https://fauna.com/) is a globally distributed, low-latency database, with
 native GraphQL support, that promises to be always consistent and always secure.
 
 As a serverless database, FaunaDB allows our applications to access data "as a
 service". Contrary to more "traditional" relational databases, there's no need
 to host and manage our own database. Zero server operations and transparent
 scalability out-of-the-box.
+
+> "Because serverless technologies abstract away the problems I don't want to
+> deal with (setting up servers, scaling them, hosting my logic etc.) and allow
+> me to just run my code whenever I need it to." - _[Tomasz Łakomy](https://tlakomy.com/why-im-excited-about-serverless)_
 
 From a developer's perspective this is awesome, because it allows us to be more
 productive and focus solely on the logic of the app we're building.
@@ -810,9 +814,8 @@ In this article, we've built a Repo Catalogue static website that you can now
 deploy on a host of your choice.
 
 The intent was to point out that it doesn't always has to be a matter of A/B
-decision. We can aim for a "hybrid" solution whenever possible, using the best
-of both worlds, where we pre-render the most we can, and asynchronously fetch
-just the data we need.
+decision. We can aim for a "hybrid" solution whenever possible, where we
+pre-render the most we can, and asynchronously fetch just the data we need.
 
 The code for this tutorial can be found in these GitHub repos:
 
