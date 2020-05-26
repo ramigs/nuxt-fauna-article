@@ -186,7 +186,7 @@ npm install dotenv faunadb simple-icons
 
 We've installed three dependencies:
 
-- faunadb: JavaScript driver for FaunaDB
+- faunadb: JavaScript [driver](https://github.com/fauna/faunadb-js) for FaunaDB
 - simple-icons: [Simple Icons](https://simpleicons.org/) npm package
 - dotenv: to store and load Fauna's secret key from a `.env` file
 
@@ -205,6 +205,8 @@ Let's now write the GraphQL schema. Create a new file `schema.graphql`
 and add the following content:
 
 ```shell
+mkdir graphql
+cd graphql
 touch schema.gql
 ```
 
@@ -240,7 +242,7 @@ Log in to your Fauna account.
 Visit the [dashboard](https://dashboard.fauna.com/) and create a new database,
 named `repos`:
 
-![Create a new FaunaDB database](./faunadb-new-database.png)
+![Create a new FaunaDB database](./fauna-new-database.png)
 
 ## Importing the schema
 
@@ -278,8 +280,8 @@ ways of interacting with Fauna data:
 - GraphQL Playground
 - GraphQL API using a GraphQL client (e.g., Apollo)
 
-We'll use the JavaScript [driver](https://github.com/fauna/faunadb-js), that
-we've already installed in a previous step.
+We'll use the JavaScript driver, that we've already installed in a previous
+step.
 
 The driver requires a Fauna Admin Key in order to authenticate connections and
 write data in the `repos` database.
@@ -295,6 +297,7 @@ from this page it will not be displayed again.
 Create a `.env` file in the root directory of the `fauna-seeder` app:
 
 ```shell
+cd ..
 touch .env
 ```
 
@@ -311,8 +314,7 @@ key from within our code.
 Let's create a function that handles a client connection to Fauna:
 
 ```shell
-mkdir functions
-cd functions
+cd graphql
 touch db-connection.js
 ```
 
@@ -364,6 +366,7 @@ Each repo is represented by three properties:
 Create a `data.json` file:
 
 ```shell
+cd ..
 touch data.json
 ```
 
@@ -387,7 +390,7 @@ touch seed.js
 This is the code that will run to populate the `Repo` collection:
 
 ```javascript
-const { client, query } = require("./functions/db-connection");
+const { client, query } = require("./graphql/db-connection");
 const q = query;
 const simpleIcons = require("simple-icons");
 const reposData = require("./data.json");
@@ -412,11 +415,21 @@ client
       )
     )
   )
-  .then(console.log("Repos seeded successfully to FaunaDB"))
-  .catch((err) => console.log("Failed to see repo to FaunaDB", err));
+  .then(console.log("Repos seeded successfully in FaunaDB"))
+  .catch((err) => console.log("Failed to add repo to FaunaDB", err));
 ```
 
 Let's break down what we've done there:
+
+- Import the `faunadb` driver from `node_modules`
+- Import the `slugify` package from `node_modules`
+- Load the Fauna secret key from `.env`
+- Instantiate a Fauna client using the secret key
+- Fetch the entire repo collection using the `allRepos` Index
+- Go through each repo, generate a slug and return an object with the route path
+  and the repo data as payload, that will be passed to the page
+- Add the route for the homepage, passing the repo collection as payload
+- Return the array of routes that should be generated
 
 We're ready to add documents to the `Repo` collection:
 
@@ -425,7 +438,7 @@ node seed.js
 ```
 
 Navigate to "Collections" from the sidebar menu, and confirm that the data was
-written successfully.
+written successfully:
 
 ![Create a new FaunaDB database](./faunadb-new-database.png)
 
@@ -440,10 +453,12 @@ tool:
 npx create-nuxt-app repo-catalogue
 ```
 
-Go through the steps and select the following options:
+Go through the guide and select the following options:
 
-- axios and dotenv in the modules step
-- Bulma in the UI framework step, to style our app
+- axios and dotenv in the **Modules** step
+- Bulma in the **UI framework** step, to style our app
+
+![Create Nuxt app](./create-nuxt-app-options.png)
 
 Once the tool finishes creating our Nuxt app, install also the other required
 dependencies:
@@ -481,7 +496,7 @@ The Repo Catalogue website will respond in two types of routes:
 - one home page, where all repos are listed
 - several repo detail pages, one for each repo in the catalogue
 
-The `pages` folder will look like this in Nuxt:
+The `/pages` folder will look like this in Nuxt:
 
 ```shell
 ├── index.vue
