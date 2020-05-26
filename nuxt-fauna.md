@@ -712,8 +712,8 @@ Build your Nuxt.js Repo Catalogue:
 npm run generate
 ```
 
-And that's it! You have now a working static site in the `dist` folder, that can
-be served directly from a CDN 👏
+And that's it! 👏 You have now a working static site in the `dist` folder, that
+can be served directly from a CDN.
 
 ![Repo Catalogue](./fauna-repo-catalogue.png)
 
@@ -796,12 +796,12 @@ included in the app's bundle:
 npm run generate
 ```
 
-And we’re done!
+And we’re done! 🎉
 
 ![Nuxt.js detail page](./fauna-nuxt-detail-page.png)
 
-A dynamic website that loads data in the frontend as the user visits the page
-that displays that data.
+A dynamic website that loads data in the frontend as the user visits the repo
+detail page.
 
 ## Conclusion
 
