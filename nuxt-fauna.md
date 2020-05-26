@@ -435,7 +435,7 @@ Let's review what we did:
 - Import list of repos from `./data.json`
 - Go through each repo, get the SVG logo and the hex color code from
   `simple-icons` and add the properties accordingly
-- Delete property `simpleIconsName` from the repo, since we don't want to send
+- Delete property `simpleIconsName` from the repo, since we don't want to write
   it to the database
 - Use the driver to map over the array of repos and create a new document for
   each one, in the `Repo` collection
@@ -478,7 +478,8 @@ Once the tool finishes creating our Nuxt app, install also the other required
 dependencies:
 
 - faunadb: JavaScript driver for FaunaDB
-- slugify: to generate slugs from repo names
+- slugify: we'll use this [package](https://www.npmjs.com/package/slugify) to
+  generate slugs from repo names
 
 ```shell
 npm install faunadb slugify
