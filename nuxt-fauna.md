@@ -1,6 +1,6 @@
 # Building a Jamstack app with Nuxt, Vue and FaunaDB
 
-In this article, we will use a Jamstack approach to build a Repository
+In this article, we'll be using a Jamstack approach to build a Repository
 Catalogue.
 
 First, we’ll populate a [FaunaDB](https://fauna.com/) database with a set of
@@ -873,7 +873,7 @@ repo data from the database, using it to build a pre-rendered app.
 
 Finally, we added dynamic data from the GitHub API to our static pages.
 
-The code for this tutorial can be found in these GitHub repos:
+The code for this tutorial can be found in the following GitHub repos:
 
 - [`fauna-seeder`](https://github.com/ramigs/fauna-seeder)
 - [`repo-catalogue`](https://github.com/ramigs/repo-catalogue)
