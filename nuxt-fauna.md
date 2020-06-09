@@ -1,10 +1,18 @@
-# Building a static Nuxt.js site with FaunaDB
+# Building a Jamstack app with Nuxt, Vue and FaunaDB
 
-In this article, we will build a Repository Catalogue, using Nuxt.js to generate
-a static site, from FaunaDB data.
+In this article, we will use a Jamstack approach to build a Repository
+Catalogue.
 
-Pre-rendering at build time is not all we will be doing. We' ll also display
-additional, more dynamic repo info, using Vue.js for client-side hydration.
+First, we’ll populate a [FaunaDB](https://fauna.com/) database with a set of
+repos. For each repo, we’ll store its [GitHub](https://github.com/) URL, the
+project’s name, logo, and main color.
+
+Then, at build time, we’ll use [Nuxt.js](https://nuxtjs.org/) to fetch the repo
+data from FaunaDB, and use it to pre-render the Repo Catalogue app.
+
+Finally, we’ll retrieve some highly dynamic repo info (such as number of stars
+and forks) from the GitHub API, and with the help of [Vue’s](https://vuejs.org/)
+awesome client-side hydration features, display it in each repo’s page.
 
 Check out the working demo [here](https://elegant-hopper-28219e.netlify.app/).
 
@@ -17,9 +25,14 @@ The Repository Catalogue will serve as a collection of GitHub projects, that you
 can customize to display repo information that is more relevant to you.
 
 Although we'll be building a very concrete implementation, its main purpose is
-to serve as an example to the core underlying idea of this article. The benefits
-of pre-rendering as much as we can, and through client-side JavaScript, load the
-rest of the data only when the user visits the page.
+to serve as an example to the core underlying idea of this article.
+
+Harnessing both the benefits from pre-rendering and the flexibility of dynamic
+sites, by generating as much as possible upfront, and loading the highly dynamic
+data via JavaScript when the user visits the page. We'll see that hydration is
+the key that gives us the major benefit of a Single Page Application (no reloads
+needed to display asynchronously requested data), while also getting the speed
+of a statically loaded site.
 
 > "It’s usually a good idea to load as much data at build time as possible to
 > improve page performance. But if the data isn’t needed by all clients, or too
@@ -31,33 +44,54 @@ rest of the data only when the user visits the page.
 When analyzing the requirements for a Repo Catalogue, we can straight away
 identify two categories of data:
 
-- some that does not change often or not at all (e.g., project name, logo, repo
-  URL)
-- some that changes frequently (e.g., repository number of stars and forks)
+1. Data that does not change often or not at all (e.g., project name, logo, repo
+   URL, and the repo list itself - after all, only some projects have a special
+   place in our heart 😄, so it's not _that_ often we need to add or delete a
+   repo from the catalogue.)
 
-This observation may then lead us to the question:
+2. Data that changes frequently (e.g., repository number of stars and forks)
+
+The former, is in our _control_ and therefore well-suited to be stored in a
+Fauna’s database. Moreover, it can then serve as a data source for any client
+app we decide to build.
+
+The latter comes from a third-party source and changes often, so it’s not a good
+candidate for database storage. It’s preferable to fetch it dynamically only
+when it’s needed, making sure we’re always getting the current data.
+
+One important consideration to make, is that this does not imply that FaunaDB is
+only appropriate for static data. Quite the contrary, FaunaDB is great for
+highly dynamic data. So, it might seem an overkill to use FaunaDB for data that
+doesn't change often. However, we plan to, in a next segment, let people 'like'
+and comment on our catalogue repositories. For such dynamic data, FaunaDB is a
+perfect fit and in the meantime, works absolutely fine for storing our
+repository list.
+
+This data categorization may then lead us to question:
 
 - "Do we really need to keep making the same request, to get the same data, take
   those same results, run them against the same template, and only then, deliver
   the page to the client?".
 
-What if we implement a Jamstack strategy, and strive to use the server side
-build to fetch the repo collection, and serve HTML and static assets to our
-site's visitors?
+- “What if we use the server-side build to fetch the repo collection, and serve
+  HTML and static assets to our site's visitors? Does that mean we are bound to
+  fully static pages?”
 
-After all, only some projects a special place in our heart 😄, so it's not
-_that_ often we need to add or delete a repo from the catalogue.
+In fact, we’ll see that by combining a Jamstack approach in the build step with
+client-side hydration, we’ll be able to enliven our static pages with highly
+dynamic data.
 
 At the end, you'll be able to take this example, adapt and apply it to your
-specific use case. You can also translate this tutorial context for other
-real-time apps very easily, explain as go along in the article.
+specific use case, by identifying and categorizing your data accordingly.
 
 ## Jamstack
 
 The concepts of Jamstack and "static-first" are not new and their advantages
 have been [extensively](https://css-tricks.com/static-or-not/)
-[documented](https://css-tricks.com/get-static/) [before](https://css-tricks.com/static-first-pre-generated-jamstack-sites-with-serverless-rendering-as-a-fallback/).
-Jamstack architectures allow us to build faster, more secure, more scalable websites.
+[documented](https://css-tricks.com/get-static/)
+[before](https://css-tricks.com/static-first-pre-generated-jamstack-sites-with-serverless-rendering-as-a-fallback/).
+Jamstack architectures allow us to build faster, more secure, more scalable
+websites.
 
 With HTML being pre-rendered once and then statically served from a CDN, a
 website has the potential for great performance. Fetching data at the build
@@ -78,13 +112,16 @@ providers.
 
 ## FaunaDB
 
-[Fauna](https://fauna.com/) is a globally distributed, low-latency database, with
-native GraphQL support, that promises to be always consistent and always secure.
+[Fauna](https://fauna.com/) is a globally distributed, low-latency database,
+with native GraphQL support, that promises to be always consistent and always
+secure.
 
-As a serverless database, FaunaDB allows our applications to access data "as a
-service". Contrary to more "traditional" relational databases, there's no need
-to host and manage our own database. Zero server operations and transparent
-scalability out-of-the-box.
+As a serverless database, FaunaDB allows applications to access data through a
+secure API, in contrast to more "traditional" relational databases that require
+you to open a connection. In that sense, FaunaDB is “connectionless” and rather
+behaves like an API, which fits perfectly in a Jamstack architecture. There is
+also no need to host and manage our own database. It requires zero server
+configuration and supports seamless scalability out-of-the-box.
 
 > "Because serverless technologies abstract away the problems I don't want to
 > deal with (setting up servers, scaling them, hosting my logic etc.) and allow
@@ -205,13 +242,11 @@ brands. We'll be using their [npm
 package](https://github.com/simple-icons/simple-icons) to get the SVG logo and
 the hex color code of each project, when the seeder app runs.
 
-Let's now write the GraphQL schema. Create a new file `schema.graphql`
-and add the following content:
+Let's now write the GraphQL schema. Create a directory `graphql` and a
+`schema.gql` file inside it:
 
 ```shell
-mkdir graphql
-cd graphql
-touch schema.gql
+mkdir graphql && cd graphql && touch schema.gql
 ```
 
 ```graphql
@@ -252,8 +287,9 @@ named `repos`:
 
 Now that the database is created, we can import the GraphQL schema into FaunaDB.
 
-FaunaDB has a feature that allows us to import a GraphQL schema to create a
-database, with an "instant" GraphQL endpoint for it.
+When you import a GraphQL schema, FaunaDB will automatically make the
+collections and indexes for you to support your queries and provide you with an
+"instant" GraphQL endpoint to start querying.
 
 We can upload our `schema.gql` file, via FaunaDB Console by clicking "GraphQL"
 on the left sidebar:
@@ -291,14 +327,21 @@ There are four ways of interacting with Fauna data:
 - GraphQL API using a GraphQL client (e.g.,
   [Apollo](https://www.apollographql.com/client/))
 
+Normally, after using a GraphQL schema to generate the collections and indexes -
+as we did, you would use the GraphQL endpoint that’s automatically provided. For
+learning purposes, I decided to try out a different approach and go with FQL.
+Although this is not the official way to interact with the data, it also
+simplifies our schema, avoiding the need for GraphQL mutations to define write
+operations.
+
 We'll use the JavaScript driver, that we've already installed in a previous
 step.
 
 The driver requires a Fauna Admin Key in order to authenticate connections and
 write data in the `repos` database.
 
-From the database's dashboard, go to "Security" on the left-hand sidebar, and create a
-new key with "Admin" Role:
+From the database's dashboard, go to "Security" on the left-hand sidebar, and
+create a new key with "Admin" Role:
 
 ![Create a Fauna Admin Key](./fauna-new-admin-key.png)
 
@@ -330,9 +373,6 @@ touch db-connection.js
 ```
 
 Add the following to `db-connection.js`:
-
-Reference this article once it's published, for the use of this code snippet:
-"Jamstack and the power of serverless databases with FaunaDB"
 
 ```javascript
 require("dotenv").config();
@@ -816,6 +856,22 @@ deploy on a host of your choice.
 The intent was to point out that it doesn't always has to be a matter of A/B
 decision. We can aim for a "hybrid" solution whenever possible, where we
 pre-render the most we can, and asynchronously fetch just the data we need.
+
+We began by writing a GraphQL schema to model our repo data. Then, we used
+FaunaDB to create a cloud database and, by simply importing the schema, we
+instantly got a full-featured data backend.
+
+Just like that! No need to deal with any server/database hosting and
+configurations, we were able to quickly start building our Repo Catalogue.
+
+Another cool benefit we get with a database like Fauna, is that it allows us to
+have a unique source of truth to represent both the data model and the API that
+interacts with it.
+
+Then, we used Nuxt to implement the app's pages and configured it to fetch the
+repo data from the database, using it to build a pre-rendered app.
+
+Finally, we added dynamic data from the GitHub API to our static pages.
 
 The code for this tutorial can be found in these GitHub repos:
 
