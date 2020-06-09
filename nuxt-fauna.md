@@ -312,7 +312,7 @@ data.
 ## Seeding data to Fauna
 
 Inside a Fauna database, we have Collections, Indexes and Documents. FaunaDB is
-a non-relational database that stores data in the JSON format.
+a relational database that stores data in the JSON format.
 
 > "A Collection is a categorized group of data. Each piece of data takes the
 > form of a Document. A Document is a “single, changeable record within a FaunaDB
@@ -396,7 +396,7 @@ exports.query = query;
 The function will try do load the secret key, and in case of success, proceed
 with creating and returning a connection to the database. Finally, the
 `createClient` function is exported, alongside the driver's `query` variable,
-which will allows us to seed the data in FQL's functional, composable style.
+which will allow us to seed the data in FQL's functional, composable style.
 
 ## Repo data
 
@@ -486,7 +486,7 @@ Let's review what we did:
   each one, in the `Repo` collection
 
 Notice that `query` operates as a transaction, which means that if an error
-occurs, none of the repos will written in the database.
+occurs, none of the repos will be written in the database.
 
 If everything goes as expected, we print a success message.
 
@@ -639,8 +639,8 @@ It's quite some code. So, let’s review the different steps of the snippet:
 
 ## Creating the pages
 
-Let's being with the homepage `/pages/index.vue`.
-This is the page that lists the repo collection.
+Let's being with the homepage `/pages/index.vue`. This is the page that lists
+the repo collection.
 
 Delete the default CSS inside `<style>` so we can start with a blank slate.
 
