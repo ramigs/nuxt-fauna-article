@@ -88,7 +88,7 @@ specific use case, by identifying and categorizing your data accordingly.
 
 The concepts of Jamstack and "static-first" are not new and their advantages
 have been [extensively](https://css-tricks.com/static-or-not/)
-[documented](https://css-tricks.com/get-static/)
+[documented](https://meyerweb.com/eric/thoughts/2020/03/22/get-static/)
 [before](https://css-tricks.com/static-first-pre-generated-jamstack-sites-with-serverless-rendering-as-a-fallback/).
 Jamstack architectures allow us to build faster, more secure, more scalable
 websites.
