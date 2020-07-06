@@ -304,7 +304,7 @@ FaunaDB automatically created the necessary collection for the `Repo` entity.
 Additionally, it also created the indexes that support the schema and interact
 with the collection:
 
-![Fauna GraphQL Playground](./fauna-db-overview.png)
+![Fauna Database Overview](./fauna-db-overview.png)
 
 At this point we have an empty database, ready to be populated with some repo
 data.
