@@ -853,7 +853,7 @@ detail page.
 In this article, we've built a Repo Catalogue static website that you can now
 deploy on a host of your choice.
 
-The intent was to point out that it doesn't always has to be a matter of A/B
+The intent was to point out that it doesn't always have to be a matter of A/B
 decision. We can aim for a "hybrid" solution whenever possible, where we
 pre-render the most we can, and asynchronously fetch just the data we need.
 
